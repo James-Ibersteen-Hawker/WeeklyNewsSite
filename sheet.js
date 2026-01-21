@@ -1,6 +1,7 @@
 "use strict";
 const sheet = {
   weekStart: 0,
+  DAYSIZE: 24 * 60 * 60 * 1000,
   ENDPOINT:
     "https://script.google.com/macros/s/AKfycby8rg83ZMgLbj94vJBPpc2YrB5CYSpSxmdBruP1BbmtKyusm11uNBKObMTEU3TcSEaR/exec",
   weeks: new Map(),
@@ -57,60 +58,51 @@ const sheet = {
       result = await this.load();
     } catch (error) {
       alert(error);
+      return null;
     }
+    const Package = {
+      fontPreconnectLinks: result.fontPreconnectLinks,
+      weeks: new Map(),
+    };
+    result.rows = result.rows.filter((e) => Boolean(e.Date));
+    const {
+      normalize: norm,
+      parseDate,
+      DAYSIZE,
+      weekFromDate,
+      Week,
+      weekStart,
+      gWkSD,
+    } = this;
     const events = result.rows.flatMap((e, i) => {
-      const IDDate = this.normalize(e.Date);
-      const IDText = this.normalize(e.Name);
-      const IDMT = this.normalize(e.METATEXT);
-      const ID = `D:${IDDate}-T:${IDText}-MT:${IDMT}-i:${i}`;
-      if (!e.DateEnd || e.DateEnd === e.Date) {
-        e.Date = this.parseDate(e.Date);
-        return { ...e, filler: false, eventLength: 1, ID: ID };
-      }
-      const daySize = 24 * 60 * 60 * 1000;
-      const [date, dateEnd] = [e.Date, e.DateEnd].map((d) => this.parseDate(d));
-      const difference = Math.ceil((dateEnd - date) / daySize) + 1;
-      return Array.from({ length: difference }, (_, a) => ({
+      const ID = `D:${norm(e.Date)}-T:${norm(e.Name)}-MT:${norm(e.METATEXT)}-i:${i}`;
+      const start = parseDate(e.Date);
+      const startTime = start.getTime();
+      const end = e.DateEnd ? parseDate(e.DateEnd) : start;
+      const diff = end <= start ? 1 : Math.ceil((end - start) / DAYSIZE) + 1;
+      return Array.from({ length: diff }, (_, a) => ({
         ...e,
-        Date: new Date(date.getTime() + daySize * a),
-        eventLength: difference,
-        ID: ID,
-        fillter: a !== 0,
+        Date: new Date(startTime + DAYSIZE * a),
+        eventLength: diff,
+        ID,
+        filler: a !== 0,
       }));
     });
     events.forEach((e) => {
-      const week = this.weekFromDate(e.Date, this.weekStart);
-      e.Date = e.Date.getTime();
-      const JSONthis = JSON.stringify(e);
-      if (!this.weeks.get(week)) this.weeks.set(week, new Set());
-      this.weeks.get(week).add(JSONthis);
+      const week = weekFromDate(e.Date, weekStart);
+      const event = { ...e, Date: e.Date.getTime() };
+      if (!Package.weeks.has(week)) Package.weeks.set(week, new Map());
+      Package.weeks.get(week).set(event.ID, event);
     });
-    const weeks = [...this.weeks]
-      .map(([k, v]) => {
-        return [k, new this.Week([...v], this.weekStart)];
-      })
+    Package.weeks = [...Package.weeks]
+      .map(([k, v]) => [k, new Week([...v], weekStart)])
       .sort(([kA], [kB]) => {
-        const week1 = kA.split("-W").map(Number);
-        const week1Date = this.getWeekStartDate(
-          week1[0],
-          week1[1],
-          this.weekStart,
-        );
-        const week2 = kB.split("-W").map(Number);
-        const week2Date = this.getWeekStartDate(
-          week2[0],
-          week2[1],
-          this.weekStart,
-        );
-        return week2Date - week1Date;
+        const convert = (wk) => gWkSD(...wk.split("-W").map(Number), weekStart);
+        return convert(kA) - convert(kB);
       });
-    console.log(weeks);
-    const Package = {
-      fontPreconnectLinks: result.fontPreconnectLinks,
-      data: weeks,
-    };
+    console.log(Package);
     return Package;
-  },
+  }, //fully fixed and refined
   weekFromDate(date, weekStart = 1) {
     const sD = new Date(date);
     const d = new Date(
@@ -131,7 +123,7 @@ const sheet = {
   normalize(str = "") {
     return str.trim().toLowerCase().replace(/\s+/g, " ");
   },
-  getWeekStartDate(yr, weekNum, start) {
+  gWkSD(yr, weekNum, start) {
     const jan1 = new Date(Date.UTC(yr, 0, 1));
     const jan1Day = jan1.getUTCDay();
     const offset = (jan1Day - start + 7) % 7;

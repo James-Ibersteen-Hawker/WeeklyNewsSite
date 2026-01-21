@@ -41,7 +41,7 @@ const sheet = {
         dayMap.get(eDate).push(e);
       });
       return new Map(
-        [...dayMap].map(([key, value]) => new this.Day(key, value)),
+        [...dayMap].map(([key, value]) => [key, new this.Day(key, value)]),
       );
     }
     buildLongTerm() {
@@ -102,14 +102,29 @@ const sheet = {
       if (!this.weeks.get(week)) this.weeks.set(week, new Set());
       this.weeks.get(week).add(JSONthis);
     });
-    const weeks = [...this.weeks].map(([key, value]) => {
-      return [key, new this.Week([...value], this.weekStart)];
-    });
+    const weeks = [...this.weeks]
+      .map(([key, value]) => {
+        return [key, new this.Week([...value], this.weekStart)];
+      })
+      .sort(([kA], [kB]) => {
+        const week1 = kA.split("-W").map(Number);
+        const week1Date = this.getWeekStartDate(
+          week1[0],
+          week1[1],
+          this.weekStart,
+        );
+        const week2 = kB.split("-W").map(Number);
+        const week2Date = this.getWeekStartDate(
+          week2[0],
+          week2[1],
+          this.weekStart,
+        );
+        return week2Date - week1Date;
+      });
     const Package = {
       fontPreconnectLinks: result.fontPreconnectLinks,
       data: weeks,
     };
-    console.log(Package);
     return Package;
   },
   weekFromDate(date, weekStart = 1) {
@@ -128,6 +143,16 @@ const sheet = {
   parseDate(date) {
     const [m, d, y] = date.split("/").map(Number);
     return new Date(y, m - 1, d);
+  },
+  getWeekStartDate(yr, weekNum, start) {
+    const jan1 = new Date(Date.UTC(yr, 0, 1));
+    const jan1Day = jan1.getUTCDay();
+    const offset = (jan1Day - start + 7) % 7;
+    const week1Start = new Date(jan1);
+    week1Start.setUTCDate(jan1.getUTCDate() - offset);
+    const result = new Date(week1Start);
+    result.setUTCDate(week1Start.getUTCDate() + (weekNum - 1) * 7);
+    return result;
   },
 };
 document.querySelector("#sheetFetch").onclick = sheet.getWeeks.bind(sheet);

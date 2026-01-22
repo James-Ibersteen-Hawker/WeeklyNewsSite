@@ -4,14 +4,14 @@ const sheet = {
   DAYSIZE: 24 * 60 * 60 * 1000,
   ENDPOINT:
     "https://script.google.com/macros/s/AKfycby8rg83ZMgLbj94vJBPpc2YrB5CYSpSxmdBruP1BbmtKyusm11uNBKObMTEU3TcSEaR/exec",
-  weeks: new Map(),
+  normalize: (str = "") => str.trim().toLowerCase().replace(/\s+/g, " "),
   Week: class {
     constructor(events, weekstart) {
       this.start = weekstart;
       this.events = events
         .map((e) => {
-          const obj = JSON.parse(e);
-          return { ...obj, Date: new Date(obj.Date) };
+          const date = e.Date;
+          return { ...e, Date: new Date(date) };
         })
         .sort((a, b) => a.Date - b.Date);
       this.Day = class {
@@ -48,7 +48,6 @@ const sheet = {
     }
   },
   async load() {
-    this.weeks.clear();
     const result = await fetch(this.ENDPOINT);
     return await result.json();
   },
@@ -91,8 +90,8 @@ const sheet = {
     events.forEach((e) => {
       const week = weekFromDate(e.Date, weekStart);
       const event = { ...e, Date: e.Date.getTime() };
-      if (!Package.weeks.has(week)) Package.weeks.set(week, new Map());
-      Package.weeks.get(week).set(event.ID, event);
+      if (!Package.weeks.has(week)) Package.weeks.set(week, []);
+      Package.weeks.get(week).push(event);
     });
     Package.weeks = [...Package.weeks]
       .map(([k, v]) => [k, new Week([...v], weekStart)])
@@ -102,7 +101,7 @@ const sheet = {
       });
     console.log(Package);
     return Package;
-  }, //fully fixed and refined
+  },
   weekFromDate(date, weekStart = 1) {
     const sD = new Date(date);
     const d = new Date(
@@ -113,15 +112,11 @@ const sheet = {
     const startOfYear = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     const dayOfYear = Math.floor((d - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
     const weekNumber = Math.ceil((dayOfYear - normalizedDay) / 7) + 1;
-    const weekKey = `${date.getUTCFullYear()}-W${weekNumber}`;
-    return weekKey;
+    return `${date.getUTCFullYear()}-W${weekNumber}`;
   },
   parseDate(date) {
     const [m, d, y] = date.split("/").map(Number);
     return new Date(y, m - 1, d);
-  },
-  normalize(str = "") {
-    return str.trim().toLowerCase().replace(/\s+/g, " ");
   },
   gWkSD(yr, weekNum, start) {
     const jan1 = new Date(Date.UTC(yr, 0, 1));

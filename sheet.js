@@ -9,10 +9,7 @@ const sheet = {
     constructor(events, weekstart) {
       this.start = weekstart;
       this.events = events
-        .map((e) => {
-          const date = e.Date;
-          return { ...e, Date: new Date(date) };
-        })
+        .map((e) => ({ ...e, Date: new Date(e.Date) }))
         .sort((a, b) => a.Date - b.Date);
       this.Day = class {
         constructor(date, events) {
@@ -42,9 +39,9 @@ const sheet = {
     }
     unique(events) {
       const IDs = new Set();
-      return events.filter((e) => {
-        if (!IDs.has(e.ID)) return (IDs.add(e.ID), true);
-      });
+      return events.filter((e) =>
+        !IDs.has(e.ID) ? (IDs.add(e.ID), true) : false,
+      );
     }
   },
   async load() {
@@ -56,8 +53,7 @@ const sheet = {
     try {
       result = await this.load();
     } catch (error) {
-      alert(error);
-      return null;
+      return new Error("failed to fetch");
     }
     const Package = {
       fontPreconnectLinks: result.fontPreconnectLinks,

@@ -289,6 +289,8 @@ class CardCarousel extends DraggingEvent {
     if (data != null) {
       this.container.classList.remove("smooth-return")
       xDist = data.x / 250;
+      // Clamp xDist to prevent cards from moving too far
+      xDist = Math.max(-this.centerIndex - 0.5, Math.min(this.centerIndex + 0.5, xDist));
     } else {
 
       

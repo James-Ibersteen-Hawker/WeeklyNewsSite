@@ -125,4 +125,3 @@ const sheet = {
     return result;
   },
 };
-document.querySelector("#sheetFetch").onclick = sheet.getWeeks.bind(sheet);

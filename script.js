@@ -19,21 +19,37 @@ async function refresh() {
       document.head.appendChild(link);
     }
   });
-  console.log(newLinks);
   return response;
+}
+function Data(obj, key, setGet) {
+  if (setGet === "set") localStorage.setItem(key, JSON.stringify(obj));
+  else if (setGet === "get") {
+    const response = localStorage.getItem(key);
+    if (response) return JSON.parse(response);
+    else return false;
+  }
 }
 const vueApp = Vue.createApp({
   async created() {
-    this.response = await refresh();
-    this.weeks = this.response.weeks;
+    if (!Data(null, "response", "get")) {
+      this.response = await refresh();
+      this.weeks = this.response.weeks;
+      Data(this.response, "response", "set");
+    }
     this.loadCycle = setInterval(async () => {
       this.response = await refresh();
       this.weeks = this.response.weeks;
+      Data(this.response, "response", "set");
     }, timeLoad);
   },
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    clearData() {
+      console.log(Data(null, "response", "get"));
+      localStorage.clear();
+    },
+  },
   computed: {},
 }).mount("#vueApp");

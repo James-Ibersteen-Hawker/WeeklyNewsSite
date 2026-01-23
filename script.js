@@ -1,12 +1,25 @@
 "use strict";
-// const timeLoad = 300000;
-const timeLoad = 5000;
+const timeLoad = 300000;
 async function refresh() {
   const response = await sheet.getWeeks();
-  const fontPreconnectLinks = response.fontPreconnectLinks.map((e) => e.trim());
-  const head = document.head.querySelectorAll("link").map((e) => e.outerHTML);
-  const links = fontPreconnectLinks.filter((link) => !head.includes(link));
-  document.head.insertAdjacentHTML("beforeend", links.join(""));
+  const newLinks = response.fontPreconnectLinks.map(
+    (e) => new URL(e.trim(), document.baseURI).href,
+  );
+  const links = new Set(
+    Array.from(document.head.querySelectorAll('link[rel="preconnect"]')).map(
+      (e) => e.href,
+    ),
+  );
+  newLinks.forEach((href) => {
+    if (!links.has(href)) {
+      links.add(href);
+      const link = document.createElement("link");
+      link.rel = "preconnect";
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  });
+  console.log(newLinks);
   return response;
 }
 const vueApp = Vue.createApp({
@@ -18,7 +31,9 @@ const vueApp = Vue.createApp({
       this.weeks = this.response.weeks;
     }, timeLoad);
   },
-  data() {},
+  data() {
+    return {};
+  },
   methods: {},
   computed: {},
 }).mount("#vueApp");

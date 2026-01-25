@@ -95,7 +95,6 @@ const sheet = {
         const convert = (wk) => gWkSD(...wk.split("-W").map(Number), weekStart);
         return convert(kA) - convert(kB);
       });
-    console.log(Package);
     return Package;
   },
   weekFromDate(date, weekStart = 1) {
@@ -125,4 +124,3 @@ const sheet = {
     return result;
   },
 };
-document.querySelector("#sheetFetch").onclick = sheet.getWeeks.bind(sheet);

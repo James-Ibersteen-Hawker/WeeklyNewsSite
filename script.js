@@ -8,18 +8,23 @@ const vueApp = Vue.createApp({
     } else this.response = cacheData;
     this.weeks = this.response.weeks;
     this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.trackReload(this.refresh);
+    this.trackReload(this.loadCycleFunc);
+    console.log(this.response);
+    //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   data() {
     return {
       index: 0,
       timeLoad: 300000,
       responseKey: "response",
+      refreshTimeout: 10000,
+      refreshAble: true,
     };
   },
   methods: {
+    //sheet computational methods
     clearData() {
-      console.log(this.Data(null, "response", "get"));
+      console.log(this.DataStorage(null, "response", "get"));
       localStorage.removeItem(this.responseKey);
     },
     DataStorage(obj, key, setGet) {
@@ -60,20 +65,29 @@ const vueApp = Vue.createApp({
       const keys = new Set();
       const keyMap = new Map();
       keyMap.set("control+r", callback);
-      keyMap.set("control+shift+r", callback);
+      // keyMap.set("control+shift+r", callback);
       keyMap.set("meta+r", callback);
-      keyMap.set("meta+shift+r", callback);
+      // keyMap.set("meta+shift+r", callback);
       window.addEventListener("keydown", (e) => {
+        e.preventDefault();
         if (e.repeat) return;
         keys.add(e.key.toLowerCase());
         const combo = [...keys].join("+");
         const func = keyMap.get(combo);
-        if (func) (e.preventDefault(), func());
+        if (func && this.refreshAble) {
+          func();
+          this.refreshAble = false;
+          setTimeout(
+            (() => (this.refreshAble = true)).bind(this),
+            this.refreshTimeout,
+          );
+        }
       });
       window.addEventListener("keyup", (e) => {
         keys.delete(e.key.toLowerCase());
       });
     },
+    //site utiliy methods
   },
   computed: {},
 }).mount("#vueApp");

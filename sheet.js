@@ -31,7 +31,31 @@ const sheet = {
         const eDate = e.Date.toISOString().slice(0, 10);
         (dayMap.get(eDate) || dayMap.set(eDate, []).get(eDate)).push(e);
       });
-      return [...dayMap].map(([k, v]) => [k, new this.Day(k, v)]);
+      const newDayMap = [...dayMap].map(([k, v]) => [k, new this.Day(k, v)]);
+      if (newDayMap.length < 5) {
+        const blankDay = [
+          "Empty Event",
+          new this.Day("Empty Event", "Empty Event"),
+        ];
+        const dates = newDayMap.map(([k]) => new Date(k));
+        const min = new Date(Math.min(...dates));
+        const max = new Date(Math.max(...dates));
+        const elem1 = dates[0];
+        const thisWeekMon = this.getMonday(dates[0], this.start);
+        const monDist = Math.floor(
+          (elem1 - thisWeekMon) / (1000 * 60 * 60 * 24),
+        );
+        const thisWeekFri = new Date(thisWeekMon);
+        thisWeekFri.setUTCDate(thisWeekMon.getUTCDate() + 4);
+        const friDist = Math.floor(
+          (thisWeekFri - elem1) / (1000 * 60 * 60 * 24),
+        );
+        if (monDist > 0)
+          newDayMap.unshift(...Array.from({ length: monDist }, () => blankDay));
+        if (friDist > 0)
+          newDayMap.push(...Array.from({ length: friDist }, () => blankDay));
+        //next to INTERPOLATE fill the days
+      }
     }
     buildLongTerm() {
       const longTermEvents = this.events.filter((e) => e.eventLength >= 5);
@@ -43,12 +67,20 @@ const sheet = {
         !IDs.has(e.ID) ? (IDs.add(e.ID), true) : false,
       );
     }
+    getMonday(date) {
+      const d = new Date(date);
+      const day = d.getUTCDay();
+      const diff = -((day - weekStart + 7) % 7);
+      d.setUTCDate(d.getUTCDate() + diff);
+      return d;
+    }
   },
   async load() {
     const result = await fetch(this.ENDPOINT);
     return await result.json();
   },
   async getWeeks() {
+    console.log("here");
     let result = null;
     try {
       result = await this.load();

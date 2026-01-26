@@ -14,7 +14,7 @@ const vueApp = Vue.createApp({
   },
   data() {
     return {
-      index: 0,
+      index: 2,
       timeLoad: 300000,
       responseKey: "response",
       refreshTimeout: 10000,
@@ -24,7 +24,6 @@ const vueApp = Vue.createApp({
   methods: {
     //sheet computational methods
     clearData() {
-      console.log(this.DataStorage(null, "response", "get"));
       localStorage.removeItem(this.responseKey);
     },
     DataStorage(obj, key, setGet) {
@@ -38,6 +37,7 @@ const vueApp = Vue.createApp({
     async loadCycleFunc() {
       this.response = await this.refresh();
       this.weeks = this.response.weeks;
+      console.log(this.weeks)
       this.DataStorage(this.response, this.responseKey, "set");
     },
     async refresh() {
@@ -75,6 +75,7 @@ const vueApp = Vue.createApp({
         const combo = [...keys].join("+");
         const func = keyMap.get(combo);
         if (func && this.refreshAble) {
+          console.log("reloaded", `timeout = ${this.refreshAble}`);
           func();
           this.refreshAble = false;
           setTimeout(
@@ -89,5 +90,12 @@ const vueApp = Vue.createApp({
     },
     //site utiliy methods
   },
-  computed: {},
+  computed: {
+    days() {
+      return this.weeks[this.index][1].days;
+    },
+    longTerm() {
+      return this.weeks[this.index][1].longTerm;
+    },
+  },
 }).mount("#vueApp");

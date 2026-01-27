@@ -31,19 +31,46 @@
       <button>test button</button> <button>test button 2</button
       ><button @click="clearData()">clear local storage</button>
 
-      <div class="container" id="cardCarousel"><div class="card-carousel">
+      <div class="container" id="cardCarousel">
+        <div class="card-carousel">
           <div class="card" v-for="(day, i) in days" :id="i + 1">
-            <div class="image-container">
+            <div class="date">{{ISOtoDate(day[0])}}</div>
+            <div v-if="day[1].events.length === 0">No Events</div>
+            <div
+              class="event"
+              v-for="event in day[1].events"
+              :style="{background: createBG(event.BG)}"
+            >
+              <h1
+                v-if="event.Name"
+                class="eName"
+                :style="{
+                  fontSize: event.HeadingSize || DefaultHSize, 
+                  fontFamily: event.NameFont || DefaultHFont 
+                }"
+              >
+                {{event.Name}}
+              </h1>
+              <p
+                v-if="event.Text"
+                class="eBody"
+                :style="{
+                  fontSize: event.BodySize || DefaultBSize, 
+                  fontFamily: event.TextFont || DefaultBFont 
+                  }"
+              >
+                {{event.Text}}
+              </p>
+              <p class="metaText d-none" v-if="event.METATEXT">
+                {{event.METATEXT}}
+              </p>
             </div>
-            <p>
-              <div class="event" v-for="event in day[1].events">{{event.Name}}</div>
-              <div class="date">{{day[1].date}}</div>
-            </p>
           </div>
         </div>
         <a href="#" class="visuallyhidden card-controller"
           >Carousel controller</a
-        ></div>
+        >
+      </div>
       <!-- 
 <h2>Check out <a target="_blank" href="https://codepen.io/WillyW/pen/RwRrvjv">Circle Carousel</a></h2> -->
       <div class="">

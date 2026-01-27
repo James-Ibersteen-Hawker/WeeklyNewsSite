@@ -9,6 +9,11 @@ const vueApp = Vue.createApp({
       refreshAble: true,
       weeks: [],
       response: {},
+      DefaultHSize: "20px",
+      DefaultBSize: "18px",
+      DefaultHFont: "'Times New Roman', serif",
+      DefaultBFont: "'Arial', sans-serif",
+      DefaultBG: "#FFFFFF",
     };
   },
   methods: {
@@ -27,7 +32,6 @@ const vueApp = Vue.createApp({
     async loadCycleFunc() {
       this.response = await this.refresh();
       this.weeks = this.response.weeks;
-      console.log(this.weeks);
       this.DataStorage(this.response, this.responseKey, "set");
     },
     async refresh() {
@@ -82,6 +86,15 @@ const vueApp = Vue.createApp({
       const today = new Date().toISOString().slice(0, 10);
     },
     //site utiliy methods
+    ISOtoDate(ISO) {
+      const [yy, mm, dd] = ISO.split("-");
+      return `${Number(mm)}/${Number(dd)}/${Number(yy)}`;
+    },
+    createBG(BG) {
+      if (BG.includes("http")) return `url(${BG})`;
+      else if (BG) return BG;
+      else return tis.DefaultBG;
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");

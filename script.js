@@ -1,30 +1,19 @@
 "use strict";
 const vueApp = Vue.createApp({
-  async created() {
-    const cacheData = this.DataStorage(null, this.responseKey, "get");
-    if (!cacheData) {
-      this.response = await this.refresh();
-      this.DataStorage(this.response, this.responseKey, "set");
-    } else this.response = cacheData;
-    this.weeks = this.response.weeks;
-    this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.trackReload(this.loadCycleFunc);
-    console.log(this.response);
-    //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
-  },
   data() {
     return {
-      index: 0,
+      index: 1,
       timeLoad: 300000,
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
+      weeks: [],
+      response: {},
     };
   },
   methods: {
     //sheet computational methods
     clearData() {
-      console.log(this.DataStorage(null, "response", "get"));
       localStorage.removeItem(this.responseKey);
     },
     DataStorage(obj, key, setGet) {
@@ -38,6 +27,7 @@ const vueApp = Vue.createApp({
     async loadCycleFunc() {
       this.response = await this.refresh();
       this.weeks = this.response.weeks;
+      console.log(this.weeks);
       this.DataStorage(this.response, this.responseKey, "set");
     },
     async refresh() {
@@ -75,6 +65,7 @@ const vueApp = Vue.createApp({
         const combo = [...keys].join("+");
         const func = keyMap.get(combo);
         if (func && this.refreshAble) {
+          console.log("reloaded", `timeout = ${this.refreshAble}`);
           func();
           this.refreshAble = false;
           setTimeout(
@@ -87,7 +78,50 @@ const vueApp = Vue.createApp({
         keys.delete(e.key.toLowerCase());
       });
     },
+    findDayNow() {
+      const today = new Date().toISOString().slice(0, 10);
+    },
     //site utiliy methods
   },
-  computed: {},
+  async mounted() {
+    const cacheData = this.DataStorage(null, this.responseKey, "get");
+    if (!cacheData) {
+      this.response = await this.refresh();
+      this.DataStorage(this.response, this.responseKey, "set");
+    } else this.response = cacheData;
+    this.weeks = this.response.weeks;
+    this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
+    this.trackReload(this.loadCycleFunc);
+    this.$nextTick(() => {
+      if (window.makeCarousel) window.makeCarousel();
+      else throw new Error("makeCarousel is not defined");
+    });
+    //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
+  },
+  computed: {
+    days() {
+      if (!this.weeks[this.index]) return [];
+      return this.weeks[this.index][1].days;
+    },
+    longTerm() {
+      if (!this.weeks[this.index]) return [];
+      return this.weeks[this.index][1].longTerm;
+    },
+  },
 }).mount("#vueApp");
+
+//Nicks stuff
+let mybutton = document.getElementById("topBtn");
+window.onscroll = function () {
+  scrollFunction();
+};
+function scrollFunction() {
+  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+function topFunction() {
+  document.documentElement.scrollTop = 0;
+}

@@ -1,13 +1,14 @@
 "use strict";
 const sheet = {
-  weekStart: 0,
+  weekStart: 1,
   DAYSIZE: 24 * 60 * 60 * 1000,
   ENDPOINT:
     "https://script.google.com/macros/s/AKfycby8rg83ZMgLbj94vJBPpc2YrB5CYSpSxmdBruP1BbmtKyusm11uNBKObMTEU3TcSEaR/exec",
   normalize: (str = "") => str.trim().toLowerCase().replace(/\s+/g, " "),
   Week: class {
-    constructor(events, weekstart) {
+    constructor(events, weekstart, dayLength) {
       this.start = weekstart;
+      this.dayLength = dayLength;
       this.events = events
         .map((e) => ({ ...e, Date: new Date(e.Date) }))
         .sort((a, b) => a.Date - b.Date);
@@ -22,16 +23,25 @@ const sheet = {
       this.trueEvents = this.unique(this.events);
     }
     buildDays() {
-      const dayMap = new Map();
+      const daysInWeek = new Map();
       const filter = this.start === 0 ? [0, 6] : [5, 6];
       this.events.forEach((e) => {
         if (e.eventLength >= 5) return;
         const thisDay = (e.Date.getUTCDay() - this.start + 7) % 7;
         if (filter.includes(thisDay)) return;
         const eDate = e.Date.toISOString().slice(0, 10);
-        (dayMap.get(eDate) || dayMap.set(eDate, []).get(eDate)).push(e);
+        if (!daysInWeek.has(eDate))
+          daysInWeek.set(eDate, new this.Day(eDate, []));
+        daysInWeek.get(eDate).events.push(e);
       });
-      return [...dayMap].map(([k, v]) => [k, new this.Day(k, v)]);
+      const start = daysInWeek.keys()?.next()?.value ?? this.events[0].Date;
+      const monday = this.getMonday(new Date(start), this.start);
+      return Array.from({ length: 5 }, (_, i) => {
+        const d = new Date(monday);
+        d.setUTCDate(monday.getUTCDate() + i);
+        const key = d.toISOString().slice(0, 10);
+        return [key, daysInWeek.get(key) ?? new this.Day(key, [])];
+      });
     }
     buildLongTerm() {
       const longTermEvents = this.events.filter((e) => e.eventLength >= 5);
@@ -39,9 +49,14 @@ const sheet = {
     }
     unique(events) {
       const IDs = new Set();
-      return events.filter((e) =>
-        !IDs.has(e.ID) ? (IDs.add(e.ID), true) : false,
-      );
+      return events.filter((e) => !IDs.has(e.ID) && IDs.add(e.ID));
+    }
+    getMonday(date, weekStart) {
+      const d = new Date(date);
+      const day = d.getUTCDay();
+      const diff = -((day - weekStart + 7) % 7);
+      d.setUTCDate(d.getUTCDate() + diff);
+      return d;
     }
   },
   async load() {
@@ -49,6 +64,7 @@ const sheet = {
     return await result.json();
   },
   async getWeeks() {
+    console.log("here");
     let result = null;
     try {
       result = await this.load();
@@ -90,7 +106,7 @@ const sheet = {
       Package.weeks.get(week).push(event);
     });
     Package.weeks = [...Package.weeks]
-      .map(([k, v]) => [k, new Week([...v], weekStart)])
+      .map(([k, v]) => [k, new Week([...v], weekStart, this.DAYSIZE)])
       .sort(([kA], [kB]) => {
         const convert = (wk) => gWkSD(...wk.split("-W").map(Number), weekStart);
         return convert(kA) - convert(kB);

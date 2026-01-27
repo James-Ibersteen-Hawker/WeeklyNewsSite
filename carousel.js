@@ -1,13 +1,8 @@
-const cardsContainer = document.querySelector(".card-carousel");
-const cardsController = document.querySelector(
-  ".card-carousel + .card-controller",
-);
-
+"use strict";
 class DraggingEvent {
   constructor(target = undefined) {
     this.target = target;
   }
-
   event(callback) {
     let handler;
 
@@ -49,12 +44,10 @@ class DraggingEvent {
       }
     });
   }
-
   // Get the distance that the user has dragged
   getDistance(callback) {
     function distanceInit(e1) {
       let startingX, startingY;
-
       if ("touches" in e1) {
         startingX = e1.touches[0].clientX;
         startingY = e1.touches[0].clientY;
@@ -62,7 +55,6 @@ class DraggingEvent {
         startingX = e1.clientX;
         startingY = e1.clientY;
       }
-
       return function (e2) {
         if (e2 === null) {
           return callback(null);
@@ -81,11 +73,9 @@ class DraggingEvent {
         }
       };
     }
-
     this.event(distanceInit);
   }
 }
-
 class CardCarousel extends DraggingEvent {
   constructor(container, controller = undefined) {
     super(container);
@@ -296,7 +286,10 @@ class CardCarousel extends DraggingEvent {
       this.container.classList.remove("smooth-return");
       xDist = data.x / 250;
       // Clamp xDist to prevent cards from moving too far
-      xDist = Math.max(-this.centerIndex - 0.5, Math.min(this.centerIndex + 0.5, xDist));
+      xDist = Math.max(
+        -this.centerIndex - 0.5,
+        Math.min(this.centerIndex + 0.5, xDist),
+      );
     } else {
       this.container.classList.add("smooth-return");
       xDist = 0;
@@ -326,24 +319,10 @@ class CardCarousel extends DraggingEvent {
     }
   }
 }
-
-const carousel = new CardCarousel(cardsContainer);
-
-//Nicks stuff
-let mybutton = document.getElementById("topBtn");
-
-window.onscroll = function () {
-  scrollFunction();
+window.makeCarousel = function () {
+  const cardsContainer = document.querySelector(".card-carousel");
+  const cardsController = document.querySelector(
+    ".card-carousel + .card-controller",
+  );
+  const carousel = new CardCarousel(cardsContainer);
 };
-
-function scrollFunction() {
-  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
-    mybutton.style.display = "block";
-  } else {
-    mybutton.style.display = "none";
-  }
-}
-
-function topFunction() {
-  document.documentElement.scrollTop = 0;
-}

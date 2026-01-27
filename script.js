@@ -7,21 +7,8 @@ const vueApp = Vue.createApp({
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
-      carousel: `
-        <div class="card-carousel">
-          <div class="card" v-for="(day, i) in days" :id="i + 1">
-            <div class="image-container">
-            </div>
-            <p>
-              <div class="event" v-for="event in day[1].events">{{event.Name}}</div>
-              <div class="date">{{day[1].date}}</div>
-            </p>
-          </div>
-        </div>
-        <a href="#" class="visuallyhidden card-controller"
-          >Carousel controller</a
-        >
-      `,
+      weeks: [],
+      response: {},
     };
   },
   methods: {
@@ -102,17 +89,32 @@ const vueApp = Vue.createApp({
     this.weeks = this.response.weeks;
     this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
     this.trackReload(this.loadCycleFunc);
-    document
-      .querySelector("#cardCarousel")
-      .insertAdjacentHTML("beforeend", this.carousel);
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {
     days() {
+      if (!this.weeks[this.index]) return [];
       return this.weeks[this.index][1].days;
     },
     longTerm() {
+      if (!this.weeks[this.index]) return [];
       return this.weeks[this.index][1].longTerm;
     },
   },
 }).mount("#vueApp");
+
+//Nicks stuff
+let mybutton = document.getElementById("topBtn");
+window.onscroll = function () {
+  scrollFunction();
+};
+function scrollFunction() {
+  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+function topFunction() {
+  document.documentElement.scrollTop = 0;
+}

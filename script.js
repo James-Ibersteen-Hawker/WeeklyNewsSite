@@ -78,6 +78,9 @@ const vueApp = Vue.createApp({
         keys.delete(e.key.toLowerCase());
       });
     },
+    findDayNow() {
+      const today = new Date().toISOString().slice(0, 10);
+    },
     //site utiliy methods
   },
   async mounted() {
@@ -89,6 +92,10 @@ const vueApp = Vue.createApp({
     this.weeks = this.response.weeks;
     this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
     this.trackReload(this.loadCycleFunc);
+    this.$nextTick(() => {
+      if (window.makeCarousel) window.makeCarousel();
+      else throw new Error("makeCarousel is not defined");
+    });
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {

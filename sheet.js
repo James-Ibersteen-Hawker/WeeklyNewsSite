@@ -6,8 +6,9 @@ const sheet = {
     "https://script.google.com/macros/s/AKfycby8rg83ZMgLbj94vJBPpc2YrB5CYSpSxmdBruP1BbmtKyusm11uNBKObMTEU3TcSEaR/exec",
   normalize: (str = "") => str.trim().toLowerCase().replace(/\s+/g, " "),
   Week: class {
-    constructor(events, weekstart) {
+    constructor(events, weekstart, dayLength) {
       this.start = weekstart;
+      this.dayLength = dayLength;
       this.events = events
         .map((e) => ({ ...e, Date: new Date(e.Date) }))
         .sort((a, b) => a.Date - b.Date);
@@ -22,40 +23,24 @@ const sheet = {
       this.trueEvents = this.unique(this.events);
     }
     buildDays() {
-      const dayMap = new Map();
+      const daysInWeek = new Map();
       const filter = this.start === 0 ? [0, 6] : [5, 6];
       this.events.forEach((e) => {
         if (e.eventLength >= 5) return;
         const thisDay = (e.Date.getUTCDay() - this.start + 7) % 7;
         if (filter.includes(thisDay)) return;
         const eDate = e.Date.toISOString().slice(0, 10);
-        (dayMap.get(eDate) || dayMap.set(eDate, []).get(eDate)).push(e);
+        if (!daysInWeek.has(eDate)) daysInWeek.set(eDate, new this.Day(eDate));
+        daysInWeek.get(eDate).events.push(e);
       });
-      const newDayMap = [...dayMap].map(([k, v]) => [k, new this.Day(k, v)]);
-      if (newDayMap.length < 5) {
-        const blankDay = [
-          "Empty Event",
-          new this.Day("Empty Event", "Empty Event"),
-        ];
-        const dates = newDayMap.map(([k]) => new Date(k));
-        const min = new Date(Math.min(...dates));
-        const max = new Date(Math.max(...dates));
-        const elem1 = dates[0];
-        const thisWeekMon = this.getMonday(dates[0], this.start);
-        const monDist = Math.floor(
-          (elem1 - thisWeekMon) / (1000 * 60 * 60 * 24),
-        );
-        const thisWeekFri = new Date(thisWeekMon);
-        thisWeekFri.setUTCDate(thisWeekMon.getUTCDate() + 4);
-        const friDist = Math.floor(
-          (thisWeekFri - elem1) / (1000 * 60 * 60 * 24),
-        );
-        if (monDist > 0)
-          newDayMap.unshift(...Array.from({ length: monDist }, () => blankDay));
-        if (friDist > 0)
-          newDayMap.push(...Array.from({ length: friDist }, () => blankDay));
-        //next to INTERPOLATE fill the days
-      }
+      const start = daysInWeek.keys()?.next()?.value ?? this.events[0].Date;
+      const monday = this.getMonday(new Date(start), this.weekstart);
+      return Array.from({ length: 5 }, (_, i) => {
+        const d = new Date(monday);
+        d.setUTCDate(monday.getUTCDate() + i);
+        const key = d.toISOString().slice(0, 10);
+        return [key, daysInWeek.get(key) ?? new this.Day(key, [])];
+      });
     }
     buildLongTerm() {
       const longTermEvents = this.events.filter((e) => e.eventLength >= 5);
@@ -63,11 +48,9 @@ const sheet = {
     }
     unique(events) {
       const IDs = new Set();
-      return events.filter((e) =>
-        !IDs.has(e.ID) ? (IDs.add(e.ID), true) : false,
-      );
+      return events.filter((e) => !IDs.has(e.ID) && IDs.add(e.ID));
     }
-    getMonday(date) {
+    getMonday(date, weekStart) {
       const d = new Date(date);
       const day = d.getUTCDay();
       const diff = -((day - weekStart + 7) % 7);
@@ -122,7 +105,7 @@ const sheet = {
       Package.weeks.get(week).push(event);
     });
     Package.weeks = [...Package.weeks]
-      .map(([k, v]) => [k, new Week([...v], weekStart)])
+      .map(([k, v]) => [k, new Week([...v], weekStart, this.DAYSIZE)])
       .sort(([kA], [kB]) => {
         const convert = (wk) => gWkSD(...wk.split("-W").map(Number), weekStart);
         return convert(kA) - convert(kB);

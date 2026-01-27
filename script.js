@@ -91,7 +91,10 @@ const vueApp = Vue.createApp({
     } else this.response = cacheData;
     this.weeks = this.response.weeks;
     this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.trackReload(this.loadCycleFunc);
+    this.trackReload(() => {
+      this.loadCycleFunc;
+      // window.location.reload()
+    });
     this.$nextTick(() => {
       if (window.makeCarousel) window.makeCarousel();
       else throw new Error("makeCarousel is not defined");
@@ -112,9 +115,7 @@ const vueApp = Vue.createApp({
 
 //Nicks stuff
 let mybutton = document.getElementById("topBtn");
-window.onscroll = function () {
-  scrollFunction();
-};
+window.onscroll = scrollFunction;
 function scrollFunction() {
   if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
     mybutton.style.display = "block";

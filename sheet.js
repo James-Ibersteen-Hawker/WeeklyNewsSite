@@ -1,6 +1,6 @@
 "use strict";
 const sheet = {
-  weekStart: 0,
+  weekStart: 1,
   DAYSIZE: 24 * 60 * 60 * 1000,
   ENDPOINT:
     "https://script.google.com/macros/s/AKfycby8rg83ZMgLbj94vJBPpc2YrB5CYSpSxmdBruP1BbmtKyusm11uNBKObMTEU3TcSEaR/exec",
@@ -30,11 +30,12 @@ const sheet = {
         const thisDay = (e.Date.getUTCDay() - this.start + 7) % 7;
         if (filter.includes(thisDay)) return;
         const eDate = e.Date.toISOString().slice(0, 10);
-        if (!daysInWeek.has(eDate)) daysInWeek.set(eDate, new this.Day(eDate));
+        if (!daysInWeek.has(eDate))
+          daysInWeek.set(eDate, new this.Day(eDate, []));
         daysInWeek.get(eDate).events.push(e);
       });
       const start = daysInWeek.keys()?.next()?.value ?? this.events[0].Date;
-      const monday = this.getMonday(new Date(start), this.weekstart);
+      const monday = this.getMonday(new Date(start), this.start);
       return Array.from({ length: 5 }, (_, i) => {
         const d = new Date(monday);
         d.setUTCDate(monday.getUTCDate() + i);

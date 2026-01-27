@@ -1,24 +1,27 @@
 "use strict";
 const vueApp = Vue.createApp({
-  async created() {
-    const cacheData = this.DataStorage(null, this.responseKey, "get");
-    if (!cacheData) {
-      this.response = await this.refresh();
-      this.DataStorage(this.response, this.responseKey, "set");
-    } else this.response = cacheData;
-    this.weeks = this.response.weeks;
-    this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.trackReload(this.loadCycleFunc);
-    console.log(this.response);
-    //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
-  },
   data() {
     return {
-      index: 2,
+      index: 1,
       timeLoad: 300000,
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
+      carousel: `
+        <div class="card-carousel">
+          <div class="card" v-for="(day, i) in days" :id="i + 1">
+            <div class="image-container">
+            </div>
+            <p>
+              <div class="event" v-for="event in day[1].events">{{event.Name}}</div>
+              <div class="date">{{day[1].date}}</div>
+            </p>
+          </div>
+        </div>
+        <a href="#" class="visuallyhidden card-controller"
+          >Carousel controller</a
+        >
+      `,
     };
   },
   methods: {
@@ -37,7 +40,7 @@ const vueApp = Vue.createApp({
     async loadCycleFunc() {
       this.response = await this.refresh();
       this.weeks = this.response.weeks;
-      console.log(this.weeks)
+      console.log(this.weeks);
       this.DataStorage(this.response, this.responseKey, "set");
     },
     async refresh() {
@@ -89,6 +92,20 @@ const vueApp = Vue.createApp({
       });
     },
     //site utiliy methods
+  },
+  async mounted() {
+    const cacheData = this.DataStorage(null, this.responseKey, "get");
+    if (!cacheData) {
+      this.response = await this.refresh();
+      this.DataStorage(this.response, this.responseKey, "set");
+    } else this.response = cacheData;
+    this.weeks = this.response.weeks;
+    this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
+    this.trackReload(this.loadCycleFunc);
+    document
+      .querySelector("#cardCarousel")
+      .insertAdjacentHTML("beforeend", this.carousel);
+    //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {
     days() {

@@ -116,7 +116,8 @@ const vueApp = Vue.createApp({
       } else if (midDist === 0) this.currentWeek = nowWeek;
     },
     ISOtoDate(ISO) {
-      const [yy, mm, dd] = ISO.slice(0, 10).split("-");
+      const myISO = new Date(ISO).toISOString();
+      const [yy, mm, dd] = myISO.slice(0, 10).split("-");
       return `${Number(mm)}/${Number(dd)}/${Number(yy)}`;
     },
     createBG(BG) {

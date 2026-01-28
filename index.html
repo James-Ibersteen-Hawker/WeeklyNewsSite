@@ -1,9 +1,6 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
     <title>Weekly News Site</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="carousel.css">
@@ -101,27 +98,204 @@
             <h1>Know!</h1>
 
         </div>
-    </main>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="stylesheet" href="BOOTSTRAP/bootstrap.min.css" />
+    <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="carousel.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-    <footer>
-        <button class="topBtn" id="topBtn" onclick="topFunction()">Back To Top</button>
-        <p>Foot Text</p>
-        <div class="social-btns mt-3">
-            <a href="https://www.facebook.com/LittleBirdToyCo" target="blank" aria-label="Facebook"> </a>
-            <i class="bi bi-facebook"></i>
-            <a href="https://www.instagram.com/LittleBirdToyCo" target="blank" aria-label="Instagram"> </a>
-            <i class="bi bi-instagram"></i>
-            <a href="https://twitter.com/LittleBirdToys" target="blank" aria-label="Twitter"> </a>
-            <i class="bi bi-twitter"></i>
-            <a href="https://www.snapchat.com/add/LittleBirdToys" target="blank" aria-label="Snapchat"> </a>
-            <i class="bi bi-snapchat "></i>
+  <body id="vueApp">
+    <div class="navBar">
+      <ul class="nav nav-underline">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="index.html">
+            <h2>Home</h2>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="">
+            <h2>Example</h2>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="">
+            <h2>Example</h2>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="">
+            <h2>Don't not click</h2>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="">
+            <h2>Example</h2>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <main class="container-fluid">
+      <button class="tab" @click="short()">Short Term</button>
+      <button class="tab" @click="long()">Long Term</button>
+      <button @click="clearData()">Refresh</button>
+      <button
+        class="tab"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#timeMachineOff"
+        aria-controls="timeMachineOff"
+      >
+        Open Time Machine
+      </button>
+      <div class="card-container shortTerm" id="cardCarousel">
+        <div class="card-carousel">
+          <div
+            class="card"
+            v-for="(day, i) in days"
+            :id="i + 1"
+            :class="{currentDay: dayNow === day[0]}"
+          >
+            <div class="date">{{ISOtoDate(day[0])}}</div>
+            <div v-if="day[1].events.length === 0">No Events</div>
+            <div
+              class="event"
+              v-for="event in day[1].events"
+              :style="{background: createBG(event.BG)}"
+            >
+              <h1
+                v-if="event.Name"
+                class="eName"
+                :style="{
+                  fontSize: event.HeadingSize || DefaultHSize, 
+                  fontFamily: event.NameFont || DefaultHFont 
+                }"
+              >
+                {{event.Name}}
+              </h1>
+              <p
+                v-if="event.Text"
+                class="eBody"
+                :style="{
+                  fontSize: event.BodySize || DefaultBSize, 
+                  fontFamily: event.TextFont || DefaultBFont 
+                  }"
+              >
+                {{event.Text}}
+              </p>
+              <p class="metaText d-none" v-if="event.METATEXT">
+                {{event.METATEXT}}
+              </p>
+            </div>
+          </div>
         </div>
-    </footer>
-    <div class="testinfo">Other info here</div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <a href="#" class="visuallyhidden card-controller"
+          >Carousel controller</a
+        >
+      </div>
+      <div
+        class="newsGenBox text-center justify-content-center longTerm d-none"
+        id="newsGenBox"
+      >
+        <nav
+          class="navbar navbar-expand-lg bg-body-tertiary headings"
+          id="longHeadings"
+        >
+          <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNavAltMarkup"
+              aria-controls="navbarNavAltMarkup"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <div class="navbar-nav">
+                <a
+                  class="nav-link"
+                  aria-current="page"
+                  v-for="(event, i) in longTerm"
+                  @click="scrollTo(event.Name, i)"
+                  >{{event.Name}}</a
+                >
+              </div>
+            </div>
+          </div>
+        </nav>
+        <div
+          class="event"
+          v-for="(event, i) in longTerm"
+          :style="{background: createBG(event.BG)}"
+          :id="'q-' + event.Name.split(' ').join('-') + i"
+        >
+          <div class="date">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
+          <h1
+            v-if="event.Name"
+            class="eName"
+            :style="{
+                  fontSize: event.HeadingSize || DefaultHSize, 
+                  fontFamily: event.NameFont || DefaultHFont 
+                }"
+          >
+            {{event.Name}}
+          </h1>
+          <p
+            v-if="event.Text"
+            class="eBody"
+            :style="{
+                  fontSize: event.BodySize || DefaultBSize, 
+                  fontFamily: event.TextFont || DefaultBFont 
+                  }"
+          >
+            {{event.Text}}
+          </p>
+          <p class="metaText d-none" v-if="event.METATEXT">
+            {{event.METATEXT}}
+          </p>
+        </div>
+      </div>
+    </main>
+    <div id="topBtn" class="topBtn">To Top</div>
+    <div
+      class="offcanvas offcanvas-start"
+      tabindex="-1"
+      id="timeMachineOff"
+      aria-labelledby="timeMachineLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="timeMachineLabel">Time Machine</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <div
+          class="date"
+          v-for="(date, i) in timeMachine"
+          :data-index="i"
+          :class="{currentWeek: index === i}"
+          @click="setWeek(i)"
+        >
+          {{ISOtoDate(date)}}
+        </div>
+      </div>
+    </div>
+    <!-- scripts -->
+    <script src="BOOTSTRAP/bootstrap.bundle.min.js"></script>
+    <script src="sheet.js"></script>
     <script src="carousel.js"></script>
-
-
-</body>
-
+    <script src="script.js"></script>
+  </body>
 </html>

@@ -36,7 +36,15 @@ const vueApp = Vue.createApp({
     },
     async refresh() {
       const response = await sheet.getWeeks();
-      const newLinks = response.fontPreconnectLinks.map(
+      this.makeLinks(response.fontPreconnectLinks);
+      return response;
+    },
+    makeLinks(linksParam) {
+      const urls = linksParam.map((link) => {
+        const match = link.match(/href="([^"]+)"/); // regex to grab the href value
+        return match ? match[1] : null; // return the URL or null if not found
+      });
+      const newLinks = urls.map(
         (e) => new URL(e.trim(), document.baseURI).href,
       );
       const links = new Set(
@@ -49,11 +57,12 @@ const vueApp = Vue.createApp({
           links.add(href);
           const link = document.createElement("link");
           link.rel = "preconnect";
+          if (href.includes("css2")) link.rel = "stylesheet";
+          if (href.includes("gstatic")) link.crossOrigin = "anonymous";
           link.href = href;
           document.head.appendChild(link);
         }
       });
-      return response;
     },
     trackReload(callback) {
       const keys = new Set();
@@ -104,14 +113,13 @@ const vueApp = Vue.createApp({
     } else this.response = cacheData;
     this.weeks = this.response.weeks;
     this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.trackReload(() => {
-      this.loadCycleFunc;
-      // window.location.reload()
-    });
+    this.trackReload(() => this.loadCycleFunc());
     this.$nextTick(() => {
       if (window.makeCarousel) window.makeCarousel();
       else throw new Error("makeCarousel is not defined");
     });
+    this.makeLinks(this.response.fontPreconnectLinks);
+    console.log(this.response);
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {

@@ -14,6 +14,7 @@ const vueApp = Vue.createApp({
       DefaultHFont: "'Times New Roman', serif",
       DefaultBFont: "'Arial', sans-serif",
       DefaultBG: "#FFFFFF",
+      currentWeek: null,
     };
   },
   methods: {
@@ -93,6 +94,24 @@ const vueApp = Vue.createApp({
     },
     findDayNow() {
       const today = new Date().toISOString().slice(0, 10);
+      const nowWeek = this.weeks[this.index];
+      let currentDay = nowWeek[1].days.findIndex(([date]) => date === today);
+      if (currentDay === -1) currentDay = 0;
+      const midDist = 2 - currentDay;
+      const temp = nowWeek[1].days.slice(-midDist); //cut from the end
+      if (midDist > 0) {
+        this.currentWeek = [
+          nowWeek[0],
+          { days: [...temp, ...nowWeek[1].days.slice(0, 5 - midDist)] },
+        ];
+      } else if (midDist < 0) {
+        if (midDist > 0) {
+          this.currentWeek = [
+            nowWeek[0],
+            { days: [...nowWeek[1].days.slice(0, 5 - midDist), ...temp] },
+          ];
+        }
+      } else if (midDist === 0) this.currentWeek = nowWeek;
     },
     //site utiliy methods
     ISOtoDate(ISO) {
@@ -103,6 +122,10 @@ const vueApp = Vue.createApp({
       if (BG.includes("http")) return `url(${BG})`;
       else if (BG) return BG;
       else return tis.DefaultBG;
+    },
+    setWeek(i) {
+      this.index = i;
+      this.findDayNow();
     },
   },
   async mounted() {
@@ -120,16 +143,25 @@ const vueApp = Vue.createApp({
     });
     this.makeLinks(this.response.fontPreconnectLinks);
     console.log(this.response);
+    this.setWeek(1);
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {
     days() {
-      if (!this.weeks[this.index]) return [];
-      return this.weeks[this.index][1].days;
+      try {
+        if (!this.currentWeek?.[1]?.days) return [];
+        return this.currentWeek[1].days;
+      } catch (error) {
+        alert(error);
+      }
     },
     longTerm() {
       if (!this.weeks[this.index]) return [];
       return this.weeks[this.index][1].longTerm;
+    },
+    timeMachine() {
+      if (!this.weeks) return [];
+      else return this.weeks.map(([_, { days }]) => days[0][0]);
     },
   },
 }).mount("#vueApp");

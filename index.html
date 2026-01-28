@@ -7,12 +7,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <!-- <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    /> -->
     <link rel="stylesheet" href="BOOTSTRAP/bootstrap.min.css" />
     <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
     <link rel="stylesheet" href="carousel.css" />
@@ -20,7 +14,6 @@
   </head>
 
   <body id="vueApp">
-    <h1 style="color: red">BOOTSTRAP TEST</h1>
     <div class="navBar">
       <ul class="nav nav-underline">
         <li class="nav-item">
@@ -55,7 +48,7 @@
       <button class="tab" @click="long()">Long Term</button>
       <button @click="clearData()">Refresh</button>
       <button
-        class="btn btn-primary"
+        class="tab"
         type="button"
         data-bs-toggle="offcanvas"
         data-bs-target="#timeMachineOff"
@@ -65,7 +58,12 @@
       </button>
       <div class="card-container shortTerm" id="cardCarousel">
         <div class="card-carousel">
-          <div class="card" v-for="(day, i) in days" :id="i + 1">
+          <div
+            class="card"
+            v-for="(day, i) in days"
+            :id="i + 1"
+            :class="{currentDay: dayNow === day[0]}"
+          >
             <div class="date">{{ISOtoDate(day[0])}}</div>
             <div v-if="day[1].events.length === 0">No Events</div>
             <div
@@ -107,7 +105,67 @@
         class="newsGenBox text-center justify-content-center longTerm d-none"
         id="newsGenBox"
       >
-        Long Term
+        <nav
+          class="navbar navbar-expand-lg bg-body-tertiary headings"
+          id="longHeadings"
+        >
+          <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNavAltMarkup"
+              aria-controls="navbarNavAltMarkup"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <div class="navbar-nav">
+                <a
+                  class="nav-link"
+                  aria-current="page"
+                  v-for="(event, i) in longTerm"
+                  @click="scrollTo(event.Name, i)"
+                  >{{event.Name}}</a
+                >
+              </div>
+            </div>
+          </div>
+        </nav>
+        <div
+          class="event"
+          v-for="(event, i) in longTerm"
+          :style="{background: createBG(event.BG)}"
+          :id="'q-' + event.Name.split(' ').join('-') + i"
+        >
+          <div class="date">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
+          <h1
+            v-if="event.Name"
+            class="eName"
+            :style="{
+                  fontSize: event.HeadingSize || DefaultHSize, 
+                  fontFamily: event.NameFont || DefaultHFont 
+                }"
+          >
+            {{event.Name}}
+          </h1>
+          <p
+            v-if="event.Text"
+            class="eBody"
+            :style="{
+                  fontSize: event.BodySize || DefaultBSize, 
+                  fontFamily: event.TextFont || DefaultBFont 
+                  }"
+          >
+            {{event.Text}}
+          </p>
+          <p class="metaText d-none" v-if="event.METATEXT">
+            {{event.METATEXT}}
+          </p>
+        </div>
       </div>
     </main>
     <div id="topBtn" class="topBtn">To Top</div>

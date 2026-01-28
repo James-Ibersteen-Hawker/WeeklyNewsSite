@@ -1,21 +1,49 @@
 html {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
-.newsGenBox{
-    background-color:grey;
+.container {
 }
-.topBtn{
-    display:none;
-    position: fixed;
-    right: 10px;
-    bottom:10px;
-    z-index:10;
-    border:solid 2px white;
-    color:Black;
-    border-radius: 10px;
+.newsGenBox {
+  background-color: grey;
+}
+.topBtn {
+  display: none;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+  border: solid 2px white;
+  color: Black;
+  border-radius: 10px;
+  height: 50px !important;
+  aspect-ratio: 1/1;
 }
 
-.topBtn:hover{
-    color:red;
+.topBtn:hover {
+  color: red;
+}
+.card {
+  background: linear-gradient(to bottom, blue, green);
+  display: flex !important;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+}
+.card .date {
+  border-bottom: 1px solid gold;
+  width: 100%;
+  color: white;
+  height: 50px;
+  line-height: 50px;
+  margin-bottom: 10px;
+}
+.card .event {
+  width: 100%;
+  border: 1px solid red;
+  box-shadow: 0px 0px 10px black inset;
+  width: 90%;
+}
+.currentWeek {
+  color: purple;
 }

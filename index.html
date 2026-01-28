@@ -58,7 +58,12 @@
       </button>
       <div class="card-container shortTerm" id="cardCarousel">
         <div class="card-carousel">
-          <div class="card" v-for="(day, i) in days" :id="i + 1">
+          <div
+            class="card"
+            v-for="(day, i) in days"
+            :id="i + 1"
+            :class="{currentDay: dayNow === day[0]}"
+          >
             <div class="date">{{ISOtoDate(day[0])}}</div>
             <div v-if="day[1].events.length === 0">No Events</div>
             <div
@@ -100,7 +105,10 @@
         class="newsGenBox text-center justify-content-center longTerm d-none"
         id="newsGenBox"
       >
-        <nav class="navbar navbar-expand-lg bg-body-tertiary headings">
+        <nav
+          class="navbar navbar-expand-lg bg-body-tertiary headings"
+          id="longHeadings"
+        >
           <div class="container-fluid">
             <a class="navbar-brand" href="#">Navbar</a>
             <button
@@ -116,8 +124,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
               <div class="navbar-nav">
-                <a class="nav-link active" aria-current="page" href="#"
-                  >Section headings, need to autogen</a
+                <a
+                  class="nav-link"
+                  aria-current="page"
+                  v-for="(event, i) in longTerm"
+                  @click="scrollTo(event.Name, i)"
+                  >{{event.Name}}</a
                 >
               </div>
             </div>
@@ -127,6 +139,7 @@
           class="event"
           v-for="(event, i) in longTerm"
           :style="{background: createBG(event.BG)}"
+          :id="'q-' + event.Name.split(' ').join('-') + i"
         >
           <div class="date">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
           <h1

@@ -136,6 +136,19 @@ const vueApp = Vue.createApp({
       document.querySelector(".longTerm").classList.add("d-none");
       document.querySelector(".shortTerm").classList.remove("d-none");
     },
+    scrollTo(name, i) {
+      const identifier = `q-${name.split(" ").join("-")}${i}`;
+      const destination = document.querySelector(`#${identifier}`);
+      const navBar = document.querySelector("#longHeadings");
+      const elemDown = destination.getBoundingClientRect().top;
+      const pageDown = document.body.getBoundingClientRect().top;
+      const total = elemDown - pageDown - navBar.offsetHeight;
+      window.scrollTo({
+        top: Math.floor(total),
+        left: 0,
+        behavior: "smooth",
+      });
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");
@@ -152,7 +165,7 @@ const vueApp = Vue.createApp({
     });
     this.makeLinks(this.response.fontPreconnectLinks);
     console.log(this.response);
-    this.setWeek(3);
+    this.setWeek(4);
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {
@@ -171,6 +184,9 @@ const vueApp = Vue.createApp({
     timeMachine() {
       if (!this.weeks) return [];
       else return this.weeks.map(([_, { days }]) => days[0][0]);
+    },
+    dayNow() {
+      return new Date().toISOString().slice(0, 10);
     },
   },
 }).mount("#vueApp");

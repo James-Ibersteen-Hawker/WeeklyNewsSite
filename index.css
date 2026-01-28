@@ -47,3 +47,6 @@ html {
 .currentWeek {
   color: purple;
 }
+.currentDay {
+  background: red !important;
+}

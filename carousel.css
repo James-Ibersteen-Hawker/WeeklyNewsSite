@@ -9,7 +9,7 @@
   right: 0;
   opacity: 0;
 }
-.container {
+.card-container {
   overflow: hidden;
   position: relative;
   padding: 20px;

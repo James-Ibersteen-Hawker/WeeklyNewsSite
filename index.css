@@ -2,9 +2,7 @@ html {
   width: 100%;
   height: 100%;
 }
-.container-fluid {
-  padding-left: 100px;
-  padding-right: 100px;
+.container {
 }
 .newsGenBox {
   background-color: grey;

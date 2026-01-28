@@ -18,9 +18,13 @@ const vueApp = Vue.createApp({
     };
   },
   methods: {
-    //sheet computational methods
-    clearData() {
+    async clearData() {
       localStorage.removeItem(this.responseKey);
+      if (this.refreshAble === true) {
+        this.refreshAble = false;
+        await this.loadCycleFunc();
+        setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
+      }
     },
     DataStorage(obj, key, setGet) {
       if (setGet === "set") localStorage.setItem(key, JSON.stringify(obj));
@@ -111,7 +115,6 @@ const vueApp = Vue.createApp({
         ];
       } else if (midDist === 0) this.currentWeek = nowWeek;
     },
-    //site utiliy methods
     ISOtoDate(ISO) {
       const [yy, mm, dd] = ISO.split("-");
       return `${Number(mm)}/${Number(dd)}/${Number(yy)}`;
@@ -124,6 +127,14 @@ const vueApp = Vue.createApp({
     setWeek(i) {
       this.index = i;
       this.findDayNow();
+    },
+    long() {
+      document.querySelector(".shortTerm").classList.add("d-none");
+      document.querySelector(".longTerm").classList.remove("d-none");
+    },
+    short() {
+      document.querySelector(".longTerm").classList.add("d-none");
+      document.querySelector(".shortTerm").classList.remove("d-none");
     },
   },
   async mounted() {

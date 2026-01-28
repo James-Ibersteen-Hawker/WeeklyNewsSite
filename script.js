@@ -151,7 +151,7 @@ const vueApp = Vue.createApp({
     },
   },
   async mounted() {
-    localStorage.clear();
+    
     const cacheData = this.DataStorage(null, this.responseKey, "get");
     if (!cacheData) {
       this.response = await this.refresh();

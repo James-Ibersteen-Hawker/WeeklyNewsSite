@@ -151,6 +151,7 @@ const vueApp = Vue.createApp({
     },
   },
   async mounted() {
+    localStorage.clear();
     const cacheData = this.DataStorage(null, this.responseKey, "get");
     if (!cacheData) {
       this.response = await this.refresh();
@@ -166,6 +167,8 @@ const vueApp = Vue.createApp({
     this.makeLinks(this.response.fontPreconnectLinks);
     console.log(this.response);
     this.setWeek(4);
+    alert("loaded")
+    hideloadingscreen();
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },
   computed: {
@@ -203,4 +206,8 @@ function scrollFunction() {
 }
 function topFunction() {
   document.documentElement.scrollTop = 0;
+}
+function hideloadingscreen() {
+  document.querySelector('#loadingscreen').classList.add('hiding')
+  setTimeout(() => document.querySelector('#loadingscreen').classList.add("d-none"), 5000)
 }

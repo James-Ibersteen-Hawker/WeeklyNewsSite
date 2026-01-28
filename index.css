@@ -123,3 +123,15 @@ body {
     transform: translateX(-99vw);
   }
 }
+
+.hiding {
+    animation: fadeout 5s linear 1;
+    -webkit-animation: fadeout 5s linear 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeout {
+    0% {opacity: 1;}
+    90% {opacity: 1;}
+    100% {opacity: 0;}
+}

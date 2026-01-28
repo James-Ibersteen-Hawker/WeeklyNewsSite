@@ -167,7 +167,6 @@ const vueApp = Vue.createApp({
     this.makeLinks(this.response.fontPreconnectLinks);
     console.log(this.response);
     this.setWeek(4);
-    alert("loaded")
     hideloadingscreen();
     //ok. Comments time: The system loads the sheet first, and caches it. If there is already cached data, it loads that instead of the sheet. Then, it creates a timer to pull the data every 5 minutes, and then makes a custom reload function which also pulls the data, but with a 10 second cooldown to prevent spamming.
   },

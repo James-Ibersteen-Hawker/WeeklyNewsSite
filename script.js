@@ -98,19 +98,17 @@ const vueApp = Vue.createApp({
       let currentDay = nowWeek[1].days.findIndex(([date]) => date === today);
       if (currentDay === -1) currentDay = 0;
       const midDist = 2 - currentDay;
-      const temp = nowWeek[1].days.slice(-midDist); //cut from the end
+      const temp = nowWeek[1].days.slice(-midDist);
       if (midDist > 0) {
         this.currentWeek = [
           nowWeek[0],
           { days: [...temp, ...nowWeek[1].days.slice(0, 5 - midDist)] },
         ];
       } else if (midDist < 0) {
-        if (midDist > 0) {
-          this.currentWeek = [
-            nowWeek[0],
-            { days: [...nowWeek[1].days.slice(0, 5 - midDist), ...temp] },
-          ];
-        }
+        this.currentWeek = [
+          nowWeek[0],
+          { days: [...nowWeek[1].days.slice(midDist, 6), ...temp] },
+        ];
       } else if (midDist === 0) this.currentWeek = nowWeek;
     },
     //site utiliy methods
@@ -136,7 +134,7 @@ const vueApp = Vue.createApp({
     } else this.response = cacheData;
     this.weeks = this.response.weeks;
     this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.trackReload(() => this.loadCycleFunc());
+    // this.trackReload(() => this.loadCycleFunc());
     this.$nextTick(() => {
       if (window.makeCarousel) window.makeCarousel();
       else throw new Error("makeCarousel is not defined");

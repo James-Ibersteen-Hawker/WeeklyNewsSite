@@ -81,7 +81,7 @@ header {
   top: 0%;
   left: 0%;
   background: linear-gradient(to bottom, rgb(0, 0, 110), rgb(0, 0, 29));
-  z-index: 2;
+  z-index: 10;
 }
 #scrollingtextbar1 {
   display: flex;

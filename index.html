@@ -14,48 +14,36 @@
   </head>
 
   <body id="vueApp">
-    <div class="navBar">
-      <ul class="nav nav-underline">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="index.html">
-            <h2>Home</h2>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">
-            <h2>Example</h2>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">
-            <h2>Example</h2>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">
-            <h2>Don't not click</h2>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="">
-            <h2>Example</h2>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <header>
+      <div class="navBar">
+        <ul class="nav nav-underline">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="index.html">
+              <h2>Home</h2>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="tabs">
+        <button class="tab" @click="scrollSection('.shortTerm')">
+          Short Term
+        </button>
+        <button class="tab" @click="scrollSection('.longTerm')">
+          Long Term
+        </button>
+        <button class="tab" @click="clearData()">Refresh</button>
+        <button
+          class="tab"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#timeMachineOff"
+          aria-controls="timeMachineOff"
+        >
+          Open Time Machine
+        </button>
+      </div>
+    </header>
     <main class="container-fluid">
-      <button class="tab" @click="short()">Short Term</button>
-      <button class="tab" @click="long()">Long Term</button>
-      <button @click="clearData()">Refresh</button>
-      <button
-        class="tab"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#timeMachineOff"
-        aria-controls="timeMachineOff"
-      >
-        Open Time Machine
-      </button>
       <div class="card-container shortTerm" id="cardCarousel">
         <div class="card-carousel">
           <div
@@ -66,35 +54,10 @@
           >
             <div class="date">{{ISOtoDate(day[0])}}</div>
             <div v-if="day[1].events.length === 0">No Events</div>
-            <div
-              class="event"
+            <event-box
               v-for="event in day[1].events"
-              :style="{background: createBG(event.BG)}"
-            >
-              <h1
-                v-if="event.Name"
-                class="eName"
-                :style="{
-                  fontSize: event.HeadingSize || DefaultHSize, 
-                  fontFamily: event.NameFont || DefaultHFont 
-                }"
-              >
-                {{event.Name}}
-              </h1>
-              <p
-                v-if="event.Text"
-                class="eBody"
-                :style="{
-                  fontSize: event.BodySize || DefaultBSize, 
-                  fontFamily: event.TextFont || DefaultBFont 
-                  }"
-              >
-                {{event.Text}}
-              </p>
-              <p class="metaText d-none" v-if="event.METATEXT">
-                {{event.METATEXT}}
-              </p>
-            </div>
+              :event="event"
+            ></event-box>
           </div>
         </div>
         <a href="#" class="visuallyhidden card-controller"
@@ -102,7 +65,7 @@
         >
       </div>
       <div
-        class="newsGenBox text-center justify-content-center longTerm d-none"
+        class="newsGenBox text-center justify-content-center longTerm"
         id="newsGenBox"
       >
         <nav
@@ -135,37 +98,12 @@
             </div>
           </div>
         </nav>
-        <div
-          class="event"
+        <event-box
           v-for="(event, i) in longTerm"
-          :style="{background: createBG(event.BG)}"
+          :event="event"
           :id="'q-' + event.Name.split(' ').join('-') + i"
-        >
-          <div class="date">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
-          <h1
-            v-if="event.Name"
-            class="eName"
-            :style="{
-                  fontSize: event.HeadingSize || DefaultHSize, 
-                  fontFamily: event.NameFont || DefaultHFont 
-                }"
-          >
-            {{event.Name}}
-          </h1>
-          <p
-            v-if="event.Text"
-            class="eBody"
-            :style="{
-                  fontSize: event.BodySize || DefaultBSize, 
-                  fontFamily: event.TextFont || DefaultBFont 
-                  }"
-          >
-            {{event.Text}}
-          </p>
-          <p class="metaText d-none" v-if="event.METATEXT">
-            {{event.METATEXT}}
-          </p>
-        </div>
+          longTerm="true"
+        ></event-box>
       </div>
     </main>
     <div id="topBtn" class="topBtn">To Top</div>

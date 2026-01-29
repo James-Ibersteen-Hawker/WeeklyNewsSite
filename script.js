@@ -1,4 +1,71 @@
 "use strict";
+const EventBox = {
+  props: {
+    event: {
+      type: Object,
+      required: true,
+    },
+    id: {
+      type: String,
+      default: "",
+    },
+    longTerm: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      dBG: "#fff",
+      dHSize: "20px",
+      dHFont: "'Times New Roman', serif",
+      dBSize: "18px",
+      dBFont: "'Arial', sans-serif",
+    };
+  },
+  methods: {
+    ISOtoDate(ISO) {
+      const myISO = new Date(ISO).toISOString();
+      const [yy, mm, dd] = myISO.slice(0, 10).split("-");
+      return `${Number(mm)}/${Number(dd)}/${Number(yy)}`;
+    },
+    createBG(BG) {
+      if (typeof BG !== "string") return "";
+      if (BG.includes("http")) return `url(${BG})`;
+      else if (BG) return BG;
+      else return this.dBG;
+    },
+  },
+  computed: {
+    bgStyle() {
+      return { background: this.createBG(this.event.BG) };
+    },
+    headingStyle() {
+      return {
+        fontSize: this.event.HeadingSize || this.dHSize,
+        fontFamily: this.event.NameFont || this.dHFont,
+      };
+    },
+    bodyStyle() {
+      return {
+        fontSize: this.event.BodySize || this.dBSize,
+        fontFamily: this.event.TextFont || this.dBFont,
+      };
+    },
+  },
+  template: `<div class="event" :style="bgStyle" :id="id">
+            <div class="date" v-if="longTerm">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
+              <h1 v-if="event.Name" class="eName" :style="headingStyle">
+                {{event.Name}}
+              </h1>
+              <p v-if="event.Text" class="eBody" :style="bodyStyle">
+                {{event.Text}}
+              </p>
+              <p class="metaText d-none" v-if="event.METATEXT">
+                {{event.METATEXT}}
+              </p>
+            </div>`,
+};
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -9,11 +76,6 @@ const vueApp = Vue.createApp({
       refreshAble: true,
       weeks: [],
       response: {},
-      DefaultHSize: "20px",
-      DefaultBSize: "18px",
-      DefaultHFont: "'Times New Roman', serif",
-      DefaultBFont: "'Arial', sans-serif",
-      DefaultBG: "#FFFFFF",
       currentWeek: null,
     };
   },
@@ -129,13 +191,15 @@ const vueApp = Vue.createApp({
       this.index = i;
       this.findDayNow();
     },
-    long() {
-      document.querySelector(".shortTerm").classList.add("d-none");
-      document.querySelector(".longTerm").classList.remove("d-none");
-    },
-    short() {
-      document.querySelector(".longTerm").classList.add("d-none");
-      document.querySelector(".shortTerm").classList.remove("d-none");
+    scrollSection(sec) {
+      const topofE = document.querySelector(sec).getBoundingClientRect().top;
+      const topOfDom = document.body.getBoundingClientRect().top;
+      const dist = topofE - topOfDom;
+      window.scrollTo({
+        top: Math.floor(dist),
+        left: 0,
+        behavior: "smooth",
+      });
     },
     scrollTo(name, i) {
       const identifier = `q-${name.split(" ").join("-")}${i}`;
@@ -189,6 +253,9 @@ const vueApp = Vue.createApp({
     dayNow() {
       return new Date().toISOString().slice(0, 10);
     },
+  },
+  components: {
+    EventBox,
   },
 }).mount("#vueApp");
 

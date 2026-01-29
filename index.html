@@ -17,6 +17,7 @@
     <header>
       <nav-bar
         name="sections"
+        for="sections"
         :custom-classes="['navBar']"
         :headings="['Short Term', 'Long Term']"
       ></nav-bar>
@@ -39,45 +40,53 @@
         </button>
       </div>
     </header>
-    <main class="container-fluid">
-      <div class="card-container shortTerm" id="cardCarousel">
-        <div class="card-carousel">
-          <div
-            class="card"
-            v-for="(day, i) in days"
-            :id="i + 1"
-            :class="{currentDay: dayNow === day[0]}"
-          >
-            <div class="date">{{ISOtoDate(day[0])}}</div>
-            <div v-if="day[1].events.length === 0">No Events</div>
-            <event-box
-              v-for="event in day[1].events"
-              :event="event"
-            ></event-box>
-          </div>
-        </div>
-        <a href="#" class="visuallyhidden card-controller"
-          >Carousel controller</a
-        >
-      </div>
-      <div
-        class="newsGenBox text-center justify-content-center longTerm"
-        id="newsGenBox"
+    <main>
+      <section
+        class="shortTerm text-center justify-content-center container-fluid"
+        :id="idSyntax('Short Term', 0)"
       >
-        <nav-bar
-          name="longTerm"
-          :custom-classes="['headings']"
-          :headings="longTerm.map(event => event.Name)"
-        ></nav-bar>
+        <div class="card-container">
+          <div class="card-carousel">
+            <div
+              class="card"
+              v-for="(day, i) in days"
+              :id="i + 1"
+              :class="{currentDay: dayNow === day[0]}"
+            >
+              <div class="date">{{ISOtoDate(day[0])}}</div>
+              <div v-if="day[1].events.length === 0">No Events</div>
+              <event-box
+                v-for="event in day[1].events"
+                :event="event"
+              ></event-box>
+            </div>
+          </div>
+          <a href="#" class="visuallyhidden card-controller">
+            Carousel controller
+          </a>
+        </div>
+      </section>
+      <hr id="split" />
+      <nav-bar
+        name="longTerm"
+        for="events"
+        fixed-height="80"
+        :custom-classes="['headings', 'navBar']"
+        :headings="longTerm.map(event => event.Name)"
+      ></nav-bar>
+      <section
+        class="longTerm text-center justify-content-center container-fluid"
+        :id="idSyntax('Long Term', 1)"
+      >
         <event-box
           v-for="(event, i) in longTerm"
           :event="event"
-          :id="'q-' + event.Name.split(' ').join('-') + i"
+          :id="idSyntax(event.Name, i)"
           longTerm="true"
         ></event-box>
-      </div>
+      </section>
     </main>
-    <div id="topBtn" class="topBtn">To Top</div>
+    <div id="topBtn" class="topBtn" @click="scrollTop()">To Top</div>
     <div
       class="offcanvas offcanvas-start"
       tabindex="-1"

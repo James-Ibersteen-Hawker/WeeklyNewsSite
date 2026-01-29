@@ -71,28 +71,71 @@ const navBar = {
     name: { type: String, default: "", required: true },
     customClasses: { type: Array, default: () => [] },
     headings: { type: Array, default: () => [], required: true },
+    for: { type: String, required: true },
+    fixedHeight: { type: String, default: 0 },
+  },
+  data() {
+    return { position: "relative", top: "0" };
   },
   methods: {
     scrollTo(name, i) {
-      // const identifier = `q-${name.split(" ").join("-")}${i}`;
-      // const destination = document.querySelector(`#${identifier}`);
-      // const navBar = document.querySelector("#longHeadings");
-      // const elemDown = destination.getBoundingClientRect().top;
-      // const pageDown = document.body.getBoundingClientRect().top;
-      // const total = elemDown - pageDown - navBar.offsetHeight;
-      // window.scrollTo({
-      //   top: Math.floor(total),
-      //   left: 0,
-      //   behavior: "smooth",
-      // });
+      const identifier = this.idSyntax(name, i);
+      const destination = document.querySelector(`#${identifier}`);
+      const elemDown = destination.getBoundingClientRect().top;
+      const pageDown = document.body.getBoundingClientRect().top;
+      const total = elemDown - pageDown - 35;
+      window.scrollTo({
+        top: Math.floor(total),
+        left: 0,
+        behavior: "smooth",
+      });
+    },
+    idSyntax(id, i = 0) {
+      return `q-${id.split(" ").join("-")}${i}`;
+    },
+    toFix() {
+      if (this.for !== "events") return;
+      const split = document.querySelector("#split");
+      if (split.getBoundingClientRect().top <= Number(this.fixedHeight)) {
+        this.position = "fixed";
+        this.top = `${this.fixedHeight}px`;
+        split.setAttribute(
+          "style",
+          `margin-bottom: ${this.$el.offsetHeight}px`,
+        );
+      } else {
+        this.position = "relative";
+        this.top = "0";
+        split.setAttribute("style", `margin-bottom: 0px`);
+      }
     },
   },
   computed: {
     navName() {
-      return `nav${this.name}${Math.round(Math.random() * 5)}`;
+      return `nav${this.name}`;
+    },
+    positionStyle() {
+      if (this.for !== "events") return;
+      return { position: this.position, top: this.top };
     },
   },
-  template: `<nav class="navbar navbar-expand-lg" :class="customClasses">
+  mounted() {
+    window.addEventListener("scroll", this.toFix)
+    this.$nextTick(() => {
+      const navBarCollapse = this.$el.querySelector(
+        ".collapse.navbar-collapse",
+      );
+      const links = Array.from(this.$el.querySelectorAll(".nav-link"));
+      links.forEach((link) => {
+        link.addEventListener("click", () => {
+          const bsCollapse =
+            bootstrap.Collapse.getOrCreateInstance(navBarCollapse);
+          bsCollapse.hide();
+        });
+      });
+    });
+  },
+  template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">Navbar</a>
           <button
@@ -245,25 +288,12 @@ const vueApp = Vue.createApp({
       this.index = i;
       this.findDayNow();
     },
-    scrollSection(sec) {
-      const topofE = document.querySelector(sec).getBoundingClientRect().top;
-      const topOfDom = document.body.getBoundingClientRect().top;
-      const dist = topofE - topOfDom;
-      window.scrollTo({
-        top: Math.floor(dist),
-        left: 0,
-        behavior: "smooth",
-      });
+    idSyntax(id, i = 0) {
+      return `q-${id.split(" ").join("-")}${i}`;
     },
-    scrollTo(name, i) {
-      const identifier = `q-${name.split(" ").join("-")}${i}`;
-      const destination = document.querySelector(`#${identifier}`);
-      const navBar = document.querySelector("#longHeadings");
-      const elemDown = destination.getBoundingClientRect().top;
-      const pageDown = document.body.getBoundingClientRect().top;
-      const total = elemDown - pageDown - navBar.offsetHeight;
+    scrollTop() {
       window.scrollTo({
-        top: Math.floor(total),
+        top: 0,
         left: 0,
         behavior: "smooth",
       });
@@ -313,7 +343,6 @@ const vueApp = Vue.createApp({
     navBar,
   },
 }).mount("#vueApp");
-
 //Nicks stuff
 let mybutton = document.getElementById("topBtn");
 window.onscroll = scrollFunction;

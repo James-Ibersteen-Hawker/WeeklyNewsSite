@@ -12,6 +12,10 @@ main {
 .longTerm {
   background-color: grey;
 }
+body {
+  width: 100%;
+  height: 100%;
+}
 .topBtn {
   display: none;
   position: fixed;
@@ -69,4 +73,90 @@ header {
 .tabs {
   background: purple;
   width: 100%;
+}
+#loadingscreen {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  background: linear-gradient(to bottom, rgb(0, 0, 110), rgb(0, 0, 29));
+  z-index: 2;
+}
+#scrollingtextbar1 {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-top: 100px;
+  width: 100%;
+  height: 100px;
+  line-height: 50px;
+  color: transparent;
+  font-size: 2em;
+  white-space: nowrap;
+  overflow: hidden;
+  border: solid 2px gold;
+  background-color: rgb(0, 0, 94);
+}
+#scrollingtextbar2 {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-top: 200px;
+  width: 100%;
+  height: 100px;
+  line-height: 50px;
+  color: transparent;
+  font-size: 2em;
+  white-space: nowrap;
+  overflow: hidden;
+  border: solid 2px gold;
+  background-color: rgb(0, 0, 94);
+}
+#loadingicon {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  object-position: center;
+  object-fit: contain;
+  margin-top: 200px;
+  width: 200px;
+}
+.textcolor {
+  color: whitesmoke;
+  animation: scroll-left 20s linear infinite;
+  line-height: 50px;
+}
+.textcolor1 {
+  color: whitesmoke;
+  animation: scroll-left 20s linear infinite;
+  line-height: 50px;
+  animation-direction: reverse;
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-99vw);
+  }
+}
+
+.hiding {
+  animation: fadeout 5s linear 1;
+  -webkit-animation: fadeout 5s linear 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

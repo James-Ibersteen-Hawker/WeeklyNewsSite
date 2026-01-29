@@ -66,6 +66,60 @@ const EventBox = {
               </p>
             </div>`,
 };
+const navBar = {
+  props: {
+    name: { type: String, default: "", required: true },
+    customClasses: { type: Array, default: () => [] },
+    headings: { type: Array, default: () => [], required: true },
+  },
+  methods: {
+    scrollTo(name, i) {
+      // const identifier = `q-${name.split(" ").join("-")}${i}`;
+      // const destination = document.querySelector(`#${identifier}`);
+      // const navBar = document.querySelector("#longHeadings");
+      // const elemDown = destination.getBoundingClientRect().top;
+      // const pageDown = document.body.getBoundingClientRect().top;
+      // const total = elemDown - pageDown - navBar.offsetHeight;
+      // window.scrollTo({
+      //   top: Math.floor(total),
+      //   left: 0,
+      //   behavior: "smooth",
+      // });
+    },
+  },
+  computed: {
+    navName() {
+      return `nav${this.name}${Math.round(Math.random() * 5)}`;
+    },
+  },
+  template: `<nav class="navbar navbar-expand-lg" :class="customClasses">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Navbar</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            :data-bs-target="'#' + navName"
+            :aria-controls="navName"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" :id="navName">
+            <div class="navbar-nav">
+              <a
+                class="nav-link"
+                aria-current="page"
+                v-for="(heading, i) in headings"
+                @click="scrollTo(heading, i)"
+                >{{heading}}</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>`,
+};
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -256,6 +310,7 @@ const vueApp = Vue.createApp({
   },
   components: {
     EventBox,
+    navBar,
   },
 }).mount("#vueApp");
 

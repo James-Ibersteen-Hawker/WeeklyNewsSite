@@ -15,15 +15,11 @@
 
   <body id="vueApp">
     <header>
-      <div class="navBar">
-        <ul class="nav nav-underline">
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="index.html">
-              <h2>Home</h2>
-            </a>
-          </li>
-        </ul>
-      </div>
+      <nav-bar
+        name="sections"
+        :custom-classes="['navBar']"
+        :headings="['Short Term', 'Long Term']"
+      ></nav-bar>
       <div class="tabs">
         <button class="tab" @click="scrollSection('.shortTerm')">
           Short Term

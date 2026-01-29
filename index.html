@@ -14,6 +14,51 @@
   </head>
 
   <body id="vueApp">
+    <header>
+      <nav-bar
+        name="sections"
+        for="sections"
+        :custom-classes="['navBar']"
+        :headings="['Short Term', 'Long Term']"
+      ></nav-bar>
+      <div class="tabs">
+        <button class="tab" @click="scrollSection('.shortTerm')">
+          Short Term
+        </button>
+        <button class="tab" @click="scrollSection('.longTerm')">
+          Long Term
+        </button>
+        <button class="tab" @click="clearData()">Refresh</button>
+        <button
+          class="tab"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#timeMachineOff"
+          aria-controls="timeMachineOff"
+        >
+          Open Time Machine
+        </button>
+      </div>
+    </header>
+    <main>
+      <section
+        class="shortTerm text-center justify-content-center container-fluid"
+        :id="idSyntax('Short Term', 0)"
+      >
+        <div class="card-container">
+          <div class="card-carousel">
+            <div
+              class="card"
+              v-for="(day, i) in days"
+              :id="i + 1"
+              :class="{currentDay: dayNow === day[0]}"
+            >
+              <div class="date">{{ISOtoDate(day[0])}}</div>
+              <div v-if="day[1].events.length === 0">No Events</div>
+              <event-box
+                v-for="event in day[1].events"
+                :event="event"
+              ></event-box>
     <div id="loadingscreen" class="">
       <div id="scrollingtextbar1">
         <h3 class="textcolor" id="repeat">
@@ -151,79 +196,32 @@
               </p>
             </div>
           </div>
+          <a href="#" class="visuallyhidden card-controller">
+            Carousel controller
+          </a>
         </div>
-        <a href="#" class="visuallyhidden card-controller"
-          >Carousel controller</a
-        >
-      </div>
-      <div
-        class="newsGenBox text-center justify-content-center longTerm d-none"
-        id="newsGenBox"
+      </section>
+      <hr id="split" />
+      <nav-bar
+        name="longTerm"
+        for="events"
+        fixed-height="80"
+        :custom-classes="['headings', 'navBar']"
+        :headings="longTerm.map(event => event.Name)"
+      ></nav-bar>
+      <section
+        class="longTerm text-center justify-content-center container-fluid"
+        :id="idSyntax('Long Term', 1)"
       >
-        <nav
-          class="navbar navbar-expand-lg bg-body-tertiary headings"
-          id="longHeadings"
-        >
-          <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button
-              class="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarNavAltMarkup"
-              aria-controls="navbarNavAltMarkup"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-              <div class="navbar-nav">
-                <a
-                  class="nav-link"
-                  aria-current="page"
-                  v-for="(event, i) in longTerm"
-                  @click="scrollTo(event.Name, i)"
-                  >{{event.Name}}</a
-                >
-              </div>
-            </div>
-          </div>
-        </nav>
-        <div
-          class="event"
+        <event-box
           v-for="(event, i) in longTerm"
-          :style="{background: createBG(event.BG)}"
-          :id="'q-' + event.Name.split(' ').join('-') + i"
-        >
-          <div class="date">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
-          <h1
-            v-if="event.Name"
-            class="eName"
-            :style="{
-                  fontSize: event.HeadingSize || DefaultHSize, 
-                  fontFamily: event.NameFont || DefaultHFont 
-                }"
-          >
-            {{event.Name}}
-          </h1>
-          <p
-            v-if="event.Text"
-            class="eBody"
-            :style="{
-                  fontSize: event.BodySize || DefaultBSize, 
-                  fontFamily: event.TextFont || DefaultBFont 
-                  }"
-          >
-            {{event.Text}}
-          </p>
-          <p class="metaText d-none" v-if="event.METATEXT">
-            {{event.METATEXT}}
-          </p>
-        </div>
-      </div>
+          :event="event"
+          :id="idSyntax(event.Name, i)"
+          longTerm="true"
+        ></event-box>
+      </section>
     </main>
-    <div id="topBtn" class="topBtn">To Top</div>
+    <div id="topBtn" class="topBtn" @click="scrollTop()">To Top</div>
     <div
       class="offcanvas offcanvas-start"
       tabindex="-1"

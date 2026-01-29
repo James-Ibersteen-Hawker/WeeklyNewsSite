@@ -1,4 +1,168 @@
 "use strict";
+const EventBox = {
+  props: {
+    event: {
+      type: Object,
+      required: true,
+    },
+    id: {
+      type: String,
+      default: "",
+    },
+    longTerm: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      dBG: "#fff",
+      dHSize: "20px",
+      dHFont: "'Times New Roman', serif",
+      dBSize: "18px",
+      dBFont: "'Arial', sans-serif",
+    };
+  },
+  methods: {
+    ISOtoDate(ISO) {
+      const myISO = new Date(ISO).toISOString();
+      const [yy, mm, dd] = myISO.slice(0, 10).split("-");
+      return `${Number(mm)}/${Number(dd)}/${Number(yy)}`;
+    },
+    createBG(BG) {
+      if (typeof BG !== "string") return "";
+      if (BG.includes("http")) return `url(${BG})`;
+      else if (BG) return BG;
+      else return this.dBG;
+    },
+  },
+  computed: {
+    bgStyle() {
+      return { background: this.createBG(this.event.BG) };
+    },
+    headingStyle() {
+      return {
+        fontSize: this.event.HeadingSize || this.dHSize,
+        fontFamily: this.event.NameFont || this.dHFont,
+      };
+    },
+    bodyStyle() {
+      return {
+        fontSize: this.event.BodySize || this.dBSize,
+        fontFamily: this.event.TextFont || this.dBFont,
+      };
+    },
+  },
+  template: `<div class="event" :style="bgStyle" :id="id">
+            <div class="date" v-if="longTerm">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
+              <h1 v-if="event.Name" class="eName" :style="headingStyle">
+                {{event.Name}}
+              </h1>
+              <p v-if="event.Text" class="eBody" :style="bodyStyle">
+                {{event.Text}}
+              </p>
+              <p class="metaText d-none" v-if="event.METATEXT">
+                {{event.METATEXT}}
+              </p>
+            </div>`,
+};
+const navBar = {
+  props: {
+    name: { type: String, default: "", required: true },
+    customClasses: { type: Array, default: () => [] },
+    headings: { type: Array, default: () => [], required: true },
+    for: { type: String, required: true },
+    fixedHeight: { type: String, default: 0 },
+  },
+  data() {
+    return { position: "relative", top: "0" };
+  },
+  methods: {
+    scrollTo(name, i) {
+      const identifier = this.idSyntax(name, i);
+      const destination = document.querySelector(`#${identifier}`);
+      const elemDown = destination.getBoundingClientRect().top;
+      const pageDown = document.body.getBoundingClientRect().top;
+      const total = elemDown - pageDown - 35;
+      window.scrollTo({
+        top: Math.floor(total),
+        left: 0,
+        behavior: "smooth",
+      });
+    },
+    idSyntax(id, i = 0) {
+      return `q-${id.split(" ").join("-")}${i}`;
+    },
+    toFix() {
+      if (this.for !== "events") return;
+      const split = document.querySelector("#split");
+      if (split.getBoundingClientRect().top <= Number(this.fixedHeight)) {
+        this.position = "fixed";
+        this.top = `${this.fixedHeight}px`;
+        split.setAttribute(
+          "style",
+          `margin-bottom: ${this.$el.offsetHeight}px`,
+        );
+      } else {
+        this.position = "relative";
+        this.top = "0";
+        split.setAttribute("style", `margin-bottom: 0px`);
+      }
+    },
+  },
+  computed: {
+    navName() {
+      return `nav${this.name}`;
+    },
+    positionStyle() {
+      if (this.for !== "events") return;
+      return { position: this.position, top: this.top };
+    },
+  },
+  mounted() {
+    window.addEventListener("scroll", this.toFix)
+    this.$nextTick(() => {
+      const navBarCollapse = this.$el.querySelector(
+        ".collapse.navbar-collapse",
+      );
+      const links = Array.from(this.$el.querySelectorAll(".nav-link"));
+      links.forEach((link) => {
+        link.addEventListener("click", () => {
+          const bsCollapse =
+            bootstrap.Collapse.getOrCreateInstance(navBarCollapse);
+          bsCollapse.hide();
+        });
+      });
+    });
+  },
+  template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Navbar</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            :data-bs-target="'#' + navName"
+            :aria-controls="navName"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" :id="navName">
+            <div class="navbar-nav">
+              <a
+                class="nav-link"
+                aria-current="page"
+                v-for="(heading, i) in headings"
+                @click="scrollTo(heading, i)"
+                >{{heading}}</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>`,
+};
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -9,11 +173,6 @@ const vueApp = Vue.createApp({
       refreshAble: true,
       weeks: [],
       response: {},
-      DefaultHSize: "20px",
-      DefaultBSize: "18px",
-      DefaultHFont: "'Times New Roman', serif",
-      DefaultBFont: "'Arial', sans-serif",
-      DefaultBG: "#FFFFFF",
       currentWeek: null,
     };
   },
@@ -116,7 +275,8 @@ const vueApp = Vue.createApp({
       } else if (midDist === 0) this.currentWeek = nowWeek;
     },
     ISOtoDate(ISO) {
-      const [yy, mm, dd] = ISO.slice(0, 10).split("-");
+      const myISO = new Date(ISO).toISOString();
+      const [yy, mm, dd] = myISO.slice(0, 10).split("-");
       return `${Number(mm)}/${Number(dd)}/${Number(yy)}`;
     },
     createBG(BG) {
@@ -128,23 +288,12 @@ const vueApp = Vue.createApp({
       this.index = i;
       this.findDayNow();
     },
-    long() {
-      document.querySelector(".shortTerm").classList.add("d-none");
-      document.querySelector(".longTerm").classList.remove("d-none");
+    idSyntax(id, i = 0) {
+      return `q-${id.split(" ").join("-")}${i}`;
     },
-    short() {
-      document.querySelector(".longTerm").classList.add("d-none");
-      document.querySelector(".shortTerm").classList.remove("d-none");
-    },
-    scrollTo(name, i) {
-      const identifier = `q-${name.split(" ").join("-")}${i}`;
-      const destination = document.querySelector(`#${identifier}`);
-      const navBar = document.querySelector("#longHeadings");
-      const elemDown = destination.getBoundingClientRect().top;
-      const pageDown = document.body.getBoundingClientRect().top;
-      const total = elemDown - pageDown - navBar.offsetHeight;
+    scrollTop() {
       window.scrollTo({
-        top: Math.floor(total),
+        top: 0,
         left: 0,
         behavior: "smooth",
       });
@@ -191,8 +340,11 @@ const vueApp = Vue.createApp({
       return new Date().toISOString().slice(0, 10);
     },
   },
+  components: {
+    EventBox,
+    navBar,
+  },
 }).mount("#vueApp");
-
 //Nicks stuff
 let mybutton = document.getElementById("topBtn");
 window.onscroll = scrollFunction;

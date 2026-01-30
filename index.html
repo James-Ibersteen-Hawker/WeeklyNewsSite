@@ -143,6 +143,8 @@
         ></button>
       </div>
       <div class="offcanvas-body">
+        <input type="search" placeholder="Search Events" v-model="searchString" id="search" name="search">
+        <label for="search">Search</label>
         <div
           class="date"
           v-for="(date, i) in timeMachine"

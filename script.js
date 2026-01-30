@@ -3,13 +3,25 @@ const Carousel = {
   props: {
     images: { type: Array, required: true, default: () => [] },
   },
+  computed: {
+    colName() {
+      return `col-${12 / (this.images.length - 1)}`;
+    },
+  },
+  methods: {
+    setModal(img) {
+      const modal = document.querySelector("#modalTarget");
+      modal.src = img;
+    },
+  },
+  mounted() {},
   template: `
       <div class="imgCarousel row">
-        <div class="mainImg col-12">
-          <img :src="images[0]" class="img-fluid"/>
+        <div class="mainImg col-12" @click="setModal(images[0], 0)">
+          <img :src="images[0]" class="img-fluid" data-bs-toggle="modal" data-bs-target="#imgModal"/>
         </div>
-        <div class="col-12">
-        
+        <div class="subImg" :class="colName" v-for="(image, i) in images.slice(1)" @click="setModal(image)" data-bs-toggle="modal" data-bs-target="#imgModal">
+          <img :src="image" class="img-fluid" />
         </div>
       </div>`,
 };
@@ -333,7 +345,7 @@ const vueApp = Vue.createApp({
       const carouselCards = Array.from(
         document.querySelectorAll(".card-carousel .card"),
       );
-      carouselCards.forEach((card) => card.removeAttribute("style"));
+      carouselCards.forEach((card) => card.removeAttribute("height"));
       await Promise.all(
         carouselCards.map(async (card) => {
           const imgs = Array.from(card.querySelectorAll("img"));
@@ -348,12 +360,8 @@ const vueApp = Vue.createApp({
       );
       const heights = carouselCards.map((e) => e.scrollHeight + 20);
       heights.sort((a, b) => b - a);
-      document
-        .querySelector(".card-carousel")
-        .setAttribute("style", `height: ${heights[0]}px`);
-      carouselCards.forEach((card) =>
-        card.setAttribute("style", `height: ${heights[0]}px`),
-      );
+      document.querySelector(".card-carousel").style.height = `${heights[0]}px`;
+      carouselCards.forEach((card) => (card.style.height = `${heights[0]}px`));
       this.resized = false;
     },
   },

@@ -36,7 +36,7 @@
 }
 .card-carousel .card {
   width: var(--card-width);
-  max-width: var(--card-max-width);
+  /* max-width: var(--card-max-width); */
   text-align: center;
   min-width: 250px;
   /* height: var(--card-height); */

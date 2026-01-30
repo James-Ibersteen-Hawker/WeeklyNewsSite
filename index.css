@@ -133,7 +133,6 @@ header {
   line-height: 50px;
   animation-direction: reverse;
 }
-
 @keyframes scroll-left {
   from {
     transform: translateX(0);
@@ -142,13 +141,11 @@ header {
     transform: translateX(-99vw);
   }
 }
-
 .hiding {
   animation: fadeout 5s linear 1;
   -webkit-animation: fadeout 5s linear 1;
   animation-fill-mode: forwards;
 }
-
 @keyframes fadeout {
   0% {
     opacity: 1;
@@ -159,4 +156,16 @@ header {
   100% {
     opacity: 0;
   }
+}
+.card-carousel .card img {
+  width: 100%;
+  aspect-ratio: 5/2;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.imgCarousel {
+  width: 80%;
+  margin-right: auto;
+  margin-left: auto;
 }

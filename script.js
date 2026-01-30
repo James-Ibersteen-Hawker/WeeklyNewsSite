@@ -434,6 +434,10 @@ const vueApp = Vue.createApp({
     dayNow() {
       return new Date().toISOString().slice(0, 10);
     },
+    weekOf() {
+      const date = this.timeMachine[this.index];
+      if (date) return `Week Of ${this.ISOtoDate(date)}`;
+    },
   },
   components: {
     EventBox,

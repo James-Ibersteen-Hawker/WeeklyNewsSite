@@ -19,7 +19,7 @@
 .card-carousel {
   --card-width: 80%;
   --card-max-width: 500px;
-  --card-height: 350px;
+  --card-height: 700px;
   --carousel-min-width: 600px;
   z-index: 1;
   position: relative;
@@ -28,7 +28,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: var(--card-height);
+  /* height: var(--card-height); */
   transition: filter 0.3s ease;
 }
 .card-carousel.smooth-return {
@@ -39,7 +39,7 @@
   max-width: var(--card-max-width);
   text-align: center;
   min-width: 250px;
-  height: var(--card-height);
+  /* height: var(--card-height); */
   position: absolute;
   margin: 0 auto;
   color: rgba(0, 0, 0, 0.5);

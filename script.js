@@ -1,4 +1,18 @@
 "use strict";
+const Carousel = {
+  props: {
+    images: { type: Array, required: true, default: () => [] },
+  },
+  template: `
+      <div class="imgCarousel row">
+        <div class="mainImg col-12">
+          <img :src="images[0]" class="img-fluid"/>
+        </div>
+        <div class="col-12">
+        
+        </div>
+      </div>`,
+};
 const EventBox = {
   props: {
     event: {
@@ -52,15 +66,28 @@ const EventBox = {
         fontFamily: this.event.TextFont || this.dBFont,
       };
     },
+    images() {
+      const { IMAGE1, IMAGE2, IMAGE3, IMAGE4 } = this.event;
+      return [IMAGE1, IMAGE2, IMAGE3, IMAGE4];
+    },
+  },
+  components: {
+    Carousel,
   },
   template: `<div class="event" :style="bgStyle" :id="id">
             <div class="date" v-if="longTerm">{{ISOtoDate(event.Date)}} - {{event.DateEnd}}</div>
               <h1 v-if="event.Name" class="eName" :style="headingStyle">
                 {{event.Name}}
               </h1>
+              <carousel v-if="images.length && event.ImagePosition === 'Top Right'" :images="images"></carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Top Left'" :images="images"></carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Above'" :images="images"></carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
                 {{event.Text}}
               </p>
+              <carousel v-if="images.length && event.ImagePosition === 'Below'" :images="images"></carousel>
+               <carousel v-if="images.length && event.ImagePosition === 'Bottom Right'" :images="images"></carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Bottom Left'" :images="images"></carousel>
               <p class="metaText d-none" v-if="event.METATEXT">
                 {{event.METATEXT}}
               </p>
@@ -120,7 +147,7 @@ const navBar = {
     },
   },
   mounted() {
-    window.addEventListener("scroll", this.toFix)
+    window.addEventListener("scroll", this.toFix);
     this.$nextTick(() => {
       const navBarCollapse = this.$el.querySelector(
         ".collapse.navbar-collapse",
@@ -163,6 +190,7 @@ const navBar = {
         </div>
       </nav>`,
 };
+
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -174,6 +202,7 @@ const vueApp = Vue.createApp({
       weeks: [],
       response: {},
       currentWeek: null,
+      resized: false,
     };
   },
   methods: {
@@ -298,6 +327,35 @@ const vueApp = Vue.createApp({
         behavior: "smooth",
       });
     },
+    async UpdateCardsHeight() {
+      if (this.resized) return;
+      this.resized = true;
+      const carouselCards = Array.from(
+        document.querySelectorAll(".card-carousel .card"),
+      );
+      carouselCards.forEach((card) => card.removeAttribute("style"));
+      await Promise.all(
+        carouselCards.map(async (card) => {
+          const imgs = Array.from(card.querySelectorAll("img"));
+          await Promise.all(
+            imgs.map(async (img) =>
+              img.complete
+                ? Promise.resolve()
+                : new Promise((res) => img.addEventListener("load", res)),
+            ),
+          );
+        }),
+      );
+      const heights = carouselCards.map((e) => e.scrollHeight + 20);
+      heights.sort((a, b) => b - a);
+      document
+        .querySelector(".card-carousel")
+        .setAttribute("style", `height: ${heights[0]}px`);
+      carouselCards.forEach((card) =>
+        card.setAttribute("style", `height: ${heights[0]}px`),
+      );
+      this.resized = false;
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");
@@ -310,6 +368,17 @@ const vueApp = Vue.createApp({
     this.$nextTick(() => {
       if (window.makeCarousel) window.makeCarousel();
       else throw new Error("makeCarousel is not defined");
+      this.UpdateCardsHeight();
+    });
+    this.resizeObserver = new ResizeObserver(async () => {
+      if (!this.resized) await this.UpdateCardsHeight();
+    });
+    window.addEventListener("resize", this.UpdateCardsHeight);
+    const carouselCards = Array.from(
+      document.querySelectorAll(".card-carousel .card"),
+    );
+    carouselCards.forEach((card) => {
+      this.resizeObserver.observe(card);
     });
     this.makeLinks(this.response.fontPreconnectLinks);
     console.log(this.response);
@@ -356,6 +425,9 @@ function topFunction() {
   document.documentElement.scrollTop = 0;
 }
 function hideloadingscreen() {
-  document.querySelector('#loadingscreen').classList.add('hiding')
-  setTimeout(() => document.querySelector('#loadingscreen').classList.add("d-none"), 5000)
+  document.querySelector("#loadingscreen").classList.add("hiding");
+  setTimeout(
+    () => document.querySelector("#loadingscreen").classList.add("d-none"),
+    5000,
+  );
 }

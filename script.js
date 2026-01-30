@@ -14,14 +14,13 @@ const Carousel = {
       modal.src = img;
     },
   },
-  mounted() {},
   template: `
       <div class="imgCarousel row">
         <div class="mainImg col-12" @click="setModal(images[0], 0)">
           <img :src="images[0]" class="img-fluid" data-bs-toggle="modal" data-bs-target="#imgModal"/>
         </div>
         <div class="subImg" :class="colName" v-for="(image, i) in images.slice(1)" @click="setModal(image)" data-bs-toggle="modal" data-bs-target="#imgModal">
-          <img :src="image" class="img-fluid" />
+          <img :src="image" class="img-fluid" v-if="image"/>
         </div>
       </div>`,
 };
@@ -61,6 +60,10 @@ const EventBox = {
       else if (BG) return BG;
       else return this.dBG;
     },
+    floatStyle(style) {
+      if (["Above", "Below"].includes(style) || !style) return;
+      return { float: style.split(" ")?.[1].toLowerCase() };
+    },
   },
   computed: {
     bgStyle() {
@@ -91,15 +94,19 @@ const EventBox = {
               <h1 v-if="event.Name" class="eName" :style="headingStyle">
                 {{event.Name}}
               </h1>
-              <carousel v-if="images.length && event.ImagePosition === 'Top Right'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Top Left'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Above'" :images="images"></carousel>
+              <carousel 
+                v-if="images.length && ['Top Right', 'Top Left', 'Above'].includes(event.ImagePosition)"
+                :images="images" 
+                :style="floatStyle(event.ImagePosition)">
+              </carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
                 {{event.Text}}
               </p>
-              <carousel v-if="images.length && event.ImagePosition === 'Below'" :images="images"></carousel>
-               <carousel v-if="images.length && event.ImagePosition === 'Bottom Right'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Bottom Left'" :images="images"></carousel>
+              <carousel 
+                v-if="images.length && ['Bottom Right', 'Bottom Left', 'Below'].includes(event.ImagePosition)"
+                :images="images" 
+                :style="floatStyle(event.ImagePosition)">
+              </carousel>
               <p class="metaText d-none" v-if="event.METATEXT">
                 {{event.METATEXT}}
               </p>

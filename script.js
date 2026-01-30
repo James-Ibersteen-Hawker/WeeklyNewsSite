@@ -230,6 +230,21 @@ const vueApp = Vue.createApp({
       response: {},
       currentWeek: null,
       resized: false,
+      searchOptions: {
+        keys: [
+          'TrueEvents.Date',
+          'TrueEvents.DateEnd',
+          'TrueEvents.Name',
+          'TrueEvents.Text',
+          'TrueEvents.METATEXT'
+        ],
+        ignoreDiacritics: true,
+        includeScore: true,
+        includeMatches: true,
+        minMatchCharLength: 2,
+        ignoreLocation: true,
+        threshold: 0.3
+      }
     };
   },
   methods: {

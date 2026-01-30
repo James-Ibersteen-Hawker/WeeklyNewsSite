@@ -163,9 +163,14 @@ header {
   object-fit: cover;
   object-position: top center;
 }
-
 .imgCarousel {
-  width: 80%;
+  width: 70%;
   margin-right: auto;
   margin-left: auto;
+}
+.imgCarousel img {
+  object-fit: cover;
+  object-position: top center;
+  width: 100%;
+  aspect-ratio: 3/1;
 }

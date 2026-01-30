@@ -5,7 +5,8 @@ const Carousel = {
   },
   computed: {
     colName() {
-      return `col-${12 / (this.images.length - 1)}`;
+      const imageArray = this.images.filter((e) => e !== "");
+      return `col-${12 / (imageArray.length - 1)}`;
     },
   },
   methods: {
@@ -118,7 +119,8 @@ const navBar = {
     customClasses: { type: Array, default: () => [] },
     headings: { type: Array, default: () => [], required: true },
     for: { type: String, required: true },
-    fixedHeight: { type: String, default: 0 },
+    fixedHeight: { default: 0 },
+    functionBindings: { type: Object, required: true },
   },
   data() {
     return { position: "relative", top: "0" };
@@ -155,6 +157,9 @@ const navBar = {
         split.setAttribute("style", `margin-bottom: 0px`);
       }
     },
+    bindingHas(h) {
+      return this.bindings.find((e) => e[0] === h);
+    },
   },
   computed: {
     navName() {
@@ -163,6 +168,9 @@ const navBar = {
     positionStyle() {
       if (this.for !== "events") return;
       return { position: this.position, top: this.top };
+    },
+    bindings() {
+      return this.functionBindings;
     },
   },
   mounted() {
@@ -183,7 +191,7 @@ const navBar = {
   },
   template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Navbar</a>
+          <a class="navbar-brand" ></a>
           <button
             class="navbar-toggler"
             type="button"
@@ -201,15 +209,15 @@ const navBar = {
                 class="nav-link"
                 aria-current="page"
                 v-for="(heading, i) in headings"
-                @click="scrollTo(heading, i)"
-                >{{heading}}</a
-              >
+                >
+                <div @click="scrollTo(heading, i)" v-if="!bindings[heading]">{{heading}}</div>
+                <div @click="bindings[heading]" v-if="bindings[heading]">{{heading}}</div>
+                </a>
             </div>
           </div>
         </div>
       </nav>`,
 };
-
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -230,6 +238,7 @@ const vueApp = Vue.createApp({
       if (this.refreshAble === true) {
         this.refreshAble = false;
         await this.loadCycleFunc();
+        this.setWeek(this.index);
         setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
       }
     },
@@ -352,7 +361,7 @@ const vueApp = Vue.createApp({
       const carouselCards = Array.from(
         document.querySelectorAll(".card-carousel .card"),
       );
-      carouselCards.forEach((card) => card.removeAttribute("height"));
+      carouselCards.forEach((card) => (card.style.height = "auto"));
       await Promise.all(
         carouselCards.map(async (card) => {
           const imgs = Array.from(card.querySelectorAll("img"));
@@ -370,6 +379,11 @@ const vueApp = Vue.createApp({
       document.querySelector(".card-carousel").style.height = `${heights[0]}px`;
       carouselCards.forEach((card) => (card.style.height = `${heights[0]}px`));
       this.resized = false;
+    },
+    openTimeMachine() {
+      const offcanvasEl = document.getElementById("timeMachineOff");
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+      offcanvas.show();
     },
   },
   async mounted() {

@@ -230,6 +230,9 @@ const vueApp = Vue.createApp({
       response: {},
       currentWeek: null,
       resized: false,
+      searchString: "",
+      searchResults: ["No Result"],
+      fuse: null,
       searchOptions: {
         keys: [
           'TrueEvents.Date',
@@ -428,6 +431,7 @@ const vueApp = Vue.createApp({
     console.log(this.response);
     this.setWeek(4);
     hideloadingscreen();
+    this.fuse = new Fuse(this.weeks, this.searchOptions);
   },
   computed: {
     days() {
@@ -458,6 +462,22 @@ const vueApp = Vue.createApp({
     EventBox,
     navBar,
   },
+  watch: {
+    week: {
+      handler(newWeek) {
+        this.fuse.setCollection(newWeek);
+        if (this.searchString) this.searchResults = this.fuse.search(this.searchString).map(r => r.item);
+      },
+      deep: true
+    }.
+    searchString: {
+      handler(newVal) {
+        if (!newVal) this.searchResults = ["No Results"];
+        else if (this.fuse) this.searchResults = this.fuse.search(this.searchString).map(r => r.item);
+      }
+      deep: true,
+    }
+  }
 }).mount("#vueApp");
 //Nicks stuff
 let mybutton = document.getElementById("topBtn");

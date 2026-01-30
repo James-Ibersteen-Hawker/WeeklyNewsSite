@@ -164,7 +164,6 @@ const navBar = {
   },
   template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Navbar</a>
           <button
             class="navbar-toggler"
             type="button"

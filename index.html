@@ -74,32 +74,16 @@
         name="sections"
         for="sections"
         :custom-classes="['navBar']"
-        :headings="['Short Term', 'Long Term']"
+        :headings="['Short Term', 'Long Term', 'Refresh', 'Time Machine']"
+        :function-bindings="{'Refresh': clearData, 'Time Machine': openTimeMachine}"
       ></nav-bar>
-      <div class="tabs">
-        <button class="tab" @click="scrollSection('.shortTerm')">
-          Short Term
-        </button>
-        <button class="tab" @click="scrollSection('.longTerm')">
-          Long Term
-        </button>
-        <button class="tab" @click="clearData()">Refresh</button>
-        <button
-          class="tab"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#timeMachineOff"
-          aria-controls="timeMachineOff"
-        >
-          Open Time Machine
-        </button>
-      </div>
     </header>
     <main>
       <section
         class="shortTerm text-center justify-content-center container-fluid"
         :id="idSyntax('Short Term', 0)"
       >
+        {{weekOf}}
         <div class="card-container">
           <div class="card-carousel">
             <div
@@ -128,6 +112,7 @@
         fixed-height="80"
         :custom-classes="['headings', 'navBar']"
         :headings="longTerm.map(event => event.Name)"
+        :function-bindings="[]"
       ></nav-bar>
       <section
         class="longTerm text-center justify-content-center container-fluid"
@@ -158,6 +143,23 @@
         ></button>
       </div>
       <div class="offcanvas-body">
+        <input
+          type="search"
+          placeholder="Search Events"
+          v-model="searchString"
+          id="search"
+          name="search"
+        />
+        <label for="search">Search</label>
+        <div id="response">
+          <ul>
+            <li v-for="result in searchResults">
+              <p @click="setWeek(result.index)">
+                {{ISOtoDate(result.startDate)}}
+              </p>
+            </li>
+          </ul>
+        </div>
         <div
           class="date"
           v-for="(date, i) in timeMachine"
@@ -169,8 +171,32 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="imgModal"
+      tabindex="-1"
+      aria-labelledby="imgModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <img id="modalTarget" />
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- scripts -->
     <script src="BOOTSTRAP/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
     <script src="sheet.js"></script>
     <script src="carousel.js"></script>
     <script src="script.js"></script>

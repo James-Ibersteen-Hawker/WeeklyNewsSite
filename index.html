@@ -143,8 +143,23 @@
         ></button>
       </div>
       <div class="offcanvas-body">
-        <input type="search" placeholder="Search Events" v-model="searchString" id="search" name="search">
+        <input
+          type="search"
+          placeholder="Search Events"
+          v-model="searchString"
+          id="search"
+          name="search"
+        />
         <label for="search">Search</label>
+        <div id="response">
+          <ul>
+            <li v-for="result in searchResults">
+              <p @click="setWeek(result.index)">
+                {{ISOtoDate(result.startDate)}}
+              </p>
+            </li>
+          </ul>
+        </div>
         <div
           class="date"
           v-for="(date, i) in timeMachine"

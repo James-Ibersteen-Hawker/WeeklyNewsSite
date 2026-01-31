@@ -231,23 +231,17 @@ const vueApp = Vue.createApp({
       currentWeek: null,
       resized: false,
       searchString: "",
-      searchResults: ["No Result"],
+      searchResults: [],
       fuse: null,
       searchOptions: {
-        keys: [
-          'TrueEvents.Date',
-          'TrueEvents.DateEnd',
-          'TrueEvents.Name',
-          'TrueEvents.Text',
-          'TrueEvents.METATEXT'
-        ],
+        keys: ["Date", "DateEnd", "Name", "Text", "METATEXT"],
         ignoreDiacritics: true,
         includeScore: true,
         includeMatches: true,
         minMatchCharLength: 2,
         ignoreLocation: true,
-        threshold: 0.3
-      }
+        threshold: 0.3,
+      },
     };
   },
   methods: {
@@ -362,6 +356,16 @@ const vueApp = Vue.createApp({
     setWeek(i) {
       this.index = i;
       this.findDayNow();
+      this.closeTimeMachine();
+    },
+    getWeek(weekNum) {
+      const week = this.weeks.find(([num, _]) => num === weekNum)[1];
+      return {
+        week,
+        index: this.weeks.findIndex(([num, _]) => num === weekNum),
+        wNum: weekNum,
+        startDate: week.days[0][0],
+      };
     },
     idSyntax(id, i = 0) {
       return `q-${id.split(" ").join("-")}${i}`;
@@ -403,6 +407,11 @@ const vueApp = Vue.createApp({
       const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
       offcanvas.show();
     },
+    closeTimeMachine() {
+      const offcanvasEl = document.getElementById("timeMachineOff");
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+      offcanvas.hide();
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");
@@ -431,7 +440,13 @@ const vueApp = Vue.createApp({
     console.log(this.response);
     this.setWeek(4);
     hideloadingscreen();
-    this.fuse = new Fuse(this.weeks, this.searchOptions);
+    this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
+      return week.trueEvents.map((e) => ({
+        ...e,
+        week: wNum,
+      }));
+    });
+    this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
   },
   computed: {
     days() {
@@ -463,21 +478,41 @@ const vueApp = Vue.createApp({
     navBar,
   },
   watch: {
-    week: {
-      handler(newWeek) {
-        this.fuse.setCollection(newWeek);
-        if (this.searchString) this.searchResults = this.fuse.search(this.searchString).map(r => r.item);
+    weeks: {
+      handler(newWeeks) {
+        this.flattenWeek = newWeeks.flatMap(([wNum, week]) => {
+          return week.trueEvents.map((e) => ({
+            ...e,
+            week: wNum,
+          }));
+        });
+        this.fuse.setCollection(this.flattenWeek);
+        if (this.searchString) {
+          const result = new Set(
+            this.fuse
+              .search(this.searchString)
+              .map((r) => JSON.stringify(this.getWeek(r.item.week))),
+          );
+          this.searchResults = [...result].map((r) => JSON.parse(r));
+        }
       },
-      deep: true
-    }.
+      deep: true,
+    },
     searchString: {
       handler(newVal) {
-        if (!newVal) this.searchResults = ["No Results"];
-        else if (this.fuse) this.searchResults = this.fuse.search(this.searchString).map(r => r.item);
-      }
+        if (!newVal) this.searchResults = [];
+        else if (this.fuse) {
+          const result = new Set(
+            this.fuse
+              .search(this.searchString)
+              .map((r) => JSON.stringify(this.getWeek(r.item.week))),
+          );
+          this.searchResults = [...result].map((r) => JSON.parse(r));
+        }
+      },
       deep: true,
-    }
-  }
+    },
+  },
 }).mount("#vueApp");
 //Nicks stuff
 let mybutton = document.getElementById("topBtn");

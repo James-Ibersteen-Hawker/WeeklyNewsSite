@@ -118,14 +118,17 @@
         class="longTerm text-center justify-content-center container-fluid"
         :id="idSyntax('Long Term', 1)"
       >
-        <event-box
-          v-for="(event, i) in longTerm"
-          :event="event"
-          :id="idSyntax(event.Name, i)"
-          longTerm="true"
-        ></event-box>
+        <div class="center">
+          <event-box
+            v-for="(event, i) in longTerm"
+            :event="event"
+            :id="idSyntax(event.Name, i)"
+            longTerm="true"
+          ></event-box>
+        </div>
       </section>
     </main>
+    <footer>#footer information, and general purpose links???</footer>
     <div id="topBtn" class="topBtn" @click="scrollTop()">To Top</div>
     <div
       class="offcanvas offcanvas-start"

@@ -5,8 +5,10 @@ const Carousel = {
   },
   computed: {
     colName() {
-      const imageArray = this.images.filter((e) => e !== "");
-      return `col-${12 / (imageArray.length - 1)}`;
+      return `col-${12 / (this.trueImages.length - 1)}`;
+    },
+    trueImages() {
+      return this.images.filter((e) => e !== "");
     },
   },
   methods: {
@@ -17,10 +19,10 @@ const Carousel = {
   },
   template: `
       <div class="imgCarousel row">
-        <div class="mainImg col-12" @click="setModal(images[0], 0)">
-          <img :src="images[0]" class="img-fluid" data-bs-toggle="modal" data-bs-target="#imgModal"/>
+        <div class="mainImg col-12" @click="setModal(images[0], 0)" :class="{oneImage: trueImages.length === 1}">
+          <img :src="trueImages[0]" class="img-fluid" data-bs-toggle="modal" data-bs-target="#imgModal"/>
         </div>
-        <div class="subImg" :class="colName" v-for="(image, i) in images.slice(1)" @click="setModal(image)" data-bs-toggle="modal" data-bs-target="#imgModal">
+        <div class="subImg" :class="colName" v-for="(image, i) in trueImages.slice(1)" @click="setModal(image)" data-bs-toggle="modal" data-bs-target="#imgModal">
           <img :src="image" class="img-fluid" v-if="image"/>
         </div>
       </div>`,

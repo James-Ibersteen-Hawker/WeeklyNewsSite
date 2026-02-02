@@ -3,13 +3,27 @@ const Carousel = {
   props: {
     images: { type: Array, required: true, default: () => [] },
   },
+  computed: {
+    colName() {
+      return `col-${12 / (this.trueImages.length - 1)}`;
+    },
+    trueImages() {
+      return this.images.filter((e) => e !== "");
+    },
+  },
+  methods: {
+    setModal(img) {
+      const modal = document.querySelector("#modalTarget");
+      modal.src = img;
+    },
+  },
   template: `
       <div class="imgCarousel row">
-        <div class="mainImg col-12">
-          <img :src="images[0]" class="img-fluid"/>
+        <div class="mainImg col-12" @click="setModal(images[0], 0)" :class="{oneImage: trueImages.length === 1}">
+          <img :src="trueImages[0]" class="img-fluid" data-bs-toggle="modal" data-bs-target="#imgModal"/>
         </div>
-        <div class="col-12">
-        
+        <div class="subImg" :class="colName" v-for="(image, i) in trueImages.slice(1)" @click="setModal(image)" data-bs-toggle="modal" data-bs-target="#imgModal">
+          <img :src="image" class="img-fluid" v-if="image"/>
         </div>
       </div>`,
 };
@@ -49,6 +63,10 @@ const EventBox = {
       else if (BG) return BG;
       else return this.dBG;
     },
+    floatStyle(style) {
+      if (["Above", "Below"].includes(style) || !style) return;
+      return { float: style.split(" ")?.[1].toLowerCase(), width: "40%" };
+    },
   },
   computed: {
     bgStyle() {
@@ -79,15 +97,19 @@ const EventBox = {
               <h1 v-if="event.Name" class="eName" :style="headingStyle">
                 {{event.Name}}
               </h1>
-              <carousel v-if="images.length && event.ImagePosition === 'Top Right'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Top Left'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Above'" :images="images"></carousel>
+              <carousel
+                v-if="images.length && ['Top Right', 'Top Left', 'Above'].includes(event.ImagePosition)"
+                :images="images"
+                :style="floatStyle(event.ImagePosition)">
+              </carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
                 {{event.Text}}
               </p>
-              <carousel v-if="images.length && event.ImagePosition === 'Below'" :images="images"></carousel>
-               <carousel v-if="images.length && event.ImagePosition === 'Bottom Right'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Bottom Left'" :images="images"></carousel>
+              <carousel
+                v-if="images.length && ['Bottom Right', 'Bottom Left', 'Below'].includes(event.ImagePosition)"
+                :images="images"
+                :style="floatStyle(event.ImagePosition)">
+              </carousel>
               <p class="metaText d-none" v-if="event.METATEXT">
                 {{event.METATEXT}}
               </p>
@@ -99,7 +121,8 @@ const navBar = {
     customClasses: { type: Array, default: () => [] },
     headings: { type: Array, default: () => [], required: true },
     for: { type: String, required: true },
-    fixedHeight: { type: String, default: 0 },
+    fixedHeight: { default: 0 },
+    functionBindings: { type: Object, required: true },
   },
   data() {
     return { position: "relative", top: "0" };
@@ -136,6 +159,9 @@ const navBar = {
         split.setAttribute("style", `margin-bottom: 0px`);
       }
     },
+    bindingHas(h) {
+      return this.bindings.find((e) => e[0] === h);
+    },
   },
   computed: {
     navName() {
@@ -144,6 +170,9 @@ const navBar = {
     positionStyle() {
       if (this.for !== "events") return;
       return { position: this.position, top: this.top };
+    },
+    bindings() {
+      return this.functionBindings;
     },
   },
   mounted() {
@@ -162,8 +191,9 @@ const navBar = {
       });
     });
   },
-  template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
+  template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
+          <a class="navbar-brand" ></a>
           <button
             class="navbar-toggler"
             type="button"
@@ -181,15 +211,15 @@ const navBar = {
                 class="nav-link"
                 aria-current="page"
                 v-for="(heading, i) in headings"
-                @click="scrollTo(heading, i)"
-                >{{heading}}</a
-              >
+                >
+                <div @click="scrollTo(heading, i)" v-if="!bindings[heading]">{{heading}}</div>
+                <div @click="bindings[heading]" v-if="bindings[heading]">{{heading}}</div>
+                </a>
             </div>
           </div>
         </div>
       </nav>`,
 };
-
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -202,6 +232,18 @@ const vueApp = Vue.createApp({
       response: {},
       currentWeek: null,
       resized: false,
+      searchString: "",
+      searchResults: [],
+      fuse: null,
+      searchOptions: {
+        keys: ["Date", "DateEnd", "Name", "Text", "METATEXT"],
+        ignoreDiacritics: true,
+        includeScore: true,
+        includeMatches: true,
+        minMatchCharLength: 2,
+        ignoreLocation: true,
+        threshold: 0.5,
+      },
     };
   },
   methods: {
@@ -210,6 +252,7 @@ const vueApp = Vue.createApp({
       if (this.refreshAble === true) {
         this.refreshAble = false;
         await this.loadCycleFunc();
+        this.setWeek(this.index);
         setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
       }
     },
@@ -315,6 +358,16 @@ const vueApp = Vue.createApp({
     setWeek(i) {
       this.index = i;
       this.findDayNow();
+      this.closeTimeMachine();
+    },
+    getWeek(weekNum) {
+      const week = this.weeks.find(([num, _]) => num === weekNum)[1];
+      return {
+        week,
+        index: this.weeks.findIndex(([num, _]) => num === weekNum),
+        wNum: weekNum,
+        startDate: week.days[0][0],
+      };
     },
     idSyntax(id, i = 0) {
       return `q-${id.split(" ").join("-")}${i}`;
@@ -332,7 +385,7 @@ const vueApp = Vue.createApp({
       const carouselCards = Array.from(
         document.querySelectorAll(".card-carousel .card"),
       );
-      carouselCards.forEach((card) => card.removeAttribute("style"));
+      carouselCards.forEach((card) => (card.style.height = "auto"));
       await Promise.all(
         carouselCards.map(async (card) => {
           const imgs = Array.from(card.querySelectorAll("img"));
@@ -347,13 +400,19 @@ const vueApp = Vue.createApp({
       );
       const heights = carouselCards.map((e) => e.scrollHeight + 20);
       heights.sort((a, b) => b - a);
-      document
-        .querySelector(".card-carousel")
-        .setAttribute("style", `height: ${heights[0]}px`);
-      carouselCards.forEach((card) =>
-        card.setAttribute("style", `height: ${heights[0]}px`),
-      );
+      document.querySelector(".card-carousel").style.height = `${heights[0]}px`;
+      carouselCards.forEach((card) => (card.style.height = `${heights[0]}px`));
       this.resized = false;
+    },
+    openTimeMachine() {
+      const offcanvasEl = document.getElementById("timeMachineOff");
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+      offcanvas.show();
+    },
+    closeTimeMachine() {
+      const offcanvasEl = document.getElementById("timeMachineOff");
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+      offcanvas.hide();
     },
   },
   async mounted() {
@@ -380,9 +439,17 @@ const vueApp = Vue.createApp({
       this.resizeObserver.observe(card);
     });
     this.makeLinks(this.response.fontPreconnectLinks);
-    console.log(this.response);
     this.setWeek(4);
     hideloadingscreen();
+    this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
+      return week.trueEvents.map((e) => ({
+        ...e,
+        week: wNum,
+      }));
+    });
+    this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
+    this.UpdateCardsHeight();
+    console.log(this.response);
   },
   computed: {
     days() {
@@ -404,10 +471,62 @@ const vueApp = Vue.createApp({
     dayNow() {
       return new Date().toISOString().slice(0, 10);
     },
+    weekOf() {
+      const date = this.timeMachine[this.index];
+      if (date) return `Week Of ${this.ISOtoDate(date)}`;
+    },
   },
   components: {
     EventBox,
     navBar,
+  },
+  watch: {
+    weeks: {
+      handler(newWeeks) {
+        this.flattenWeek = newWeeks.flatMap(([wNum, week]) => {
+          return week.trueEvents.map((e) => ({
+            ...e,
+            week: wNum,
+          }));
+        });
+        this.fuse.setCollection(this.flattenWeek);
+        if (this.searchString) {
+          const result = new Set(
+            this.fuse
+              .search(this.searchString)
+              .map((r) => JSON.stringify(this.getWeek(r.item.week))),
+          );
+          this.searchResults = [...result].map((r) => JSON.parse(r));
+        }
+      },
+      deep: true,
+    },
+    searchString: {
+      handler(newVal) {
+        if (!newVal) this.searchResults = [];
+        else if (this.fuse) {
+          const result = new Set(
+            this.fuse
+              .search(this.searchString)
+              .map((r) => JSON.stringify(this.getWeek(r.item.week)))
+              .sort((a, b) => {
+                const { startDate: aST } = JSON.parse(a);
+                const { startDate: bST } = JSON.parse(b);
+                return new Date(aST) - new Date(bST);
+              }),
+          );
+          this.searchResults = [...result].map((r) => JSON.parse(r));
+        }
+      },
+      deep: true,
+    },
+    currentWeek: {
+      async handler() {
+        await this.$nextTick();
+        this.UpdateCardsHeight();
+      },
+      deep: true,
+    },
   },
 }).mount("#vueApp");
 //Nicks stuff

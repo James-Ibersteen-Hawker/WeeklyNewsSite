@@ -14,7 +14,7 @@
   </head>
 
   <body id="vueApp">
-    <div id="loadingscreen" class="">
+    <div id="loadingscreen" class="d-none">
       <div id="scrollingtextbar1">
         <h3 class="textcolor" id="repeat">
           MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
@@ -74,33 +74,17 @@
         name="sections"
         for="sections"
         :custom-classes="['navBar']"
-        :headings="['Short Term', 'Long Term']"
+        :headings="['Short Term', 'Long Term', 'Refresh', 'Time Machine']"
+        :function-bindings="{'Refresh': clearData, 'Time Machine': openTimeMachine}"
       ></nav-bar>
-      <div class="tabs">
-        <button class="tab" @click="scrollSection('.shortTerm')">
-          Short Term
-        </button>
-        <button class="tab" @click="scrollSection('.longTerm')">
-          Long Term
-        </button>
-        <button class="tab" @click="clearData()">Refresh</button>
-        <button
-          class="tab"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#timeMachineOff"
-          aria-controls="timeMachineOff"
-        >
-          Open Time Machine
-        </button>
-      </div>
     </header>
     <main>
       <section
         class="shortTerm text-center justify-content-center container-fluid"
         :id="idSyntax('Short Term', 0)"
       >
-        <div class="card-container">
+        {{weekOf}}
+        <div class="card-container d-none d-sm-block">
           <div class="card-carousel">
             <div
               class="card"
@@ -120,27 +104,65 @@
             Carousel controller
           </a>
         </div>
+        <div class="dropdown-container d-block d-sm-none">
+          <div class="accordion" id="accordionExample">
+            <div
+              class="accordion-item sectionCollapse"
+              v-for="(day, i) in days"
+            >
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  :data-bs-target="`#collapse${i}`"
+                  aria-expanded="false"
+                  :aria-controls="`collapse${i}`"
+                >
+                  {{ISOtoDate(day[0])}}
+                </button>
+              </h2>
+              <div
+                :id="`collapse${i}`"
+                class="accordion-collapse collapse"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <div v-if="day[1].events.length === 0">No Events</div>
+                  <event-box
+                    v-for="event in day[1].events"
+                    :event="event"
+                  ></event-box>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       <hr id="split" />
       <nav-bar
         name="longTerm"
         for="events"
-        fixed-height="80"
+        fixed-height="55"
         :custom-classes="['headings', 'navBar']"
         :headings="longTerm.map(event => event.Name)"
+        :function-bindings="[]"
       ></nav-bar>
       <section
         class="longTerm text-center justify-content-center container-fluid"
         :id="idSyntax('Long Term', 1)"
       >
-        <event-box
-          v-for="(event, i) in longTerm"
-          :event="event"
-          :id="idSyntax(event.Name, i)"
-          longTerm="true"
-        ></event-box>
+        <div class="center">
+          <event-box
+            v-for="(event, i) in longTerm"
+            :event="event"
+            :id="idSyntax(event.Name, i)"
+            longTerm="true"
+          ></event-box>
+        </div>
       </section>
     </main>
+    <footer>#footer information, and general purpose links???</footer>
     <div id="topBtn" class="topBtn" @click="scrollTop()">To Top</div>
     <div
       class="offcanvas offcanvas-start"
@@ -151,7 +173,6 @@
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="timeMachineLabel">Time Machine</h5>
         <button
-        
           type="button"
           class="btn-close"
           data-bs-dismiss="offcanvas"
@@ -159,6 +180,23 @@
         ></button>
       </div>
       <div class="offcanvas-body">
+        <input
+          type="search"
+          placeholder="Search Events"
+          v-model="searchString"
+          id="search"
+          name="search"
+        />
+        <label for="search">Search</label>
+        <div id="response">
+          <ul>
+            <li v-for="result in searchResults">
+              <p @click="setWeek(result.index)">
+                {{ISOtoDate(result.startDate)}}
+              </p>
+            </li>
+          </ul>
+        </div>
         <div
           class="date"
           v-for="(date, i) in timeMachine"
@@ -170,8 +208,32 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="imgModal"
+      tabindex="-1"
+      aria-labelledby="imgModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <img id="modalTarget" />
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- scripts -->
     <script src="BOOTSTRAP/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
     <script src="sheet.js"></script>
     <script src="carousel.js"></script>
     <script src="script.js"></script>

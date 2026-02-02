@@ -57,7 +57,7 @@ body {
   width: 90%;
 }
 .currentWeek {
-  color: purple;
+  color: gold;
 }
 .currentDay {
   background: gold !important;
@@ -149,9 +149,14 @@ header {
 }
 
 .offcanvas {
-  background-color: darkblue;
-  border: solid goldenrod 10px ;
+  background: linear-gradient(to left, darkblue, black);
+  border-left: solid goldenrod 10px ;
   color:whitesmoke;
+}
+
+.btn-close {
+  --bs-btn-close-color: whitesmoke !important;
+  filter: invert(100%);
 }
 
 @keyframes scroll-left {

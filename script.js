@@ -191,7 +191,7 @@ const navBar = {
       });
     });
   },
-  template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
+  template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
           <a class="navbar-brand" ></a>
           <button
@@ -242,7 +242,7 @@ const vueApp = Vue.createApp({
         includeMatches: true,
         minMatchCharLength: 2,
         ignoreLocation: true,
-        threshold: 0.3,
+        threshold: 0.5,
       },
     };
   },
@@ -508,7 +508,12 @@ const vueApp = Vue.createApp({
           const result = new Set(
             this.fuse
               .search(this.searchString)
-              .map((r) => JSON.stringify(this.getWeek(r.item.week))),
+              .map((r) => JSON.stringify(this.getWeek(r.item.week)))
+              .sort((a, b) => {
+                const { startDate: aST } = JSON.parse(a);
+                const { startDate: bST } = JSON.parse(b);
+                return new Date(aST) - new Date(bST);
+              }),
           );
           this.searchResults = [...result].map((r) => JSON.parse(r));
         }

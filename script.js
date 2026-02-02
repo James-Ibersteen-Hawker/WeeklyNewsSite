@@ -65,7 +65,7 @@ const EventBox = {
     },
     floatStyle(style) {
       if (["Above", "Below"].includes(style) || !style) return;
-      return { float: style.split(" ")?.[1].toLowerCase() };
+      return { float: style.split(" ")?.[1].toLowerCase(), width: "40%" };
     },
   },
   computed: {
@@ -439,7 +439,6 @@ const vueApp = Vue.createApp({
       this.resizeObserver.observe(card);
     });
     this.makeLinks(this.response.fontPreconnectLinks);
-    console.log(this.response);
     this.setWeek(4);
     hideloadingscreen();
     this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
@@ -449,6 +448,8 @@ const vueApp = Vue.createApp({
       }));
     });
     this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
+    this.UpdateCardsHeight();
+    console.log(this.response);
   },
   computed: {
     days() {
@@ -511,6 +512,13 @@ const vueApp = Vue.createApp({
           );
           this.searchResults = [...result].map((r) => JSON.parse(r));
         }
+      },
+      deep: true,
+    },
+    currentWeek: {
+      async handler() {
+        await this.$nextTick();
+        this.UpdateCardsHeight();
       },
       deep: true,
     },

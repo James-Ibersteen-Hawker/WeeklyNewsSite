@@ -62,7 +62,6 @@ body {
   margin-bottom: 10px;
 }
 .card .event {
-  width: 100%;
   border: 1px solid red;
   box-shadow: 0px 0px 10px black inset;
   width: 90%;
@@ -199,6 +198,7 @@ footer {
   align-items: center;
   position: fixed;
   bottom: 0;
+  z-index: 5;
 }
 .oneImage img {
   border: 1px solid blue;

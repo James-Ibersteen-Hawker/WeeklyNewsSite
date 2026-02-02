@@ -109,7 +109,13 @@ const sheet = {
       .sort(([kA], [kB]) => {
         const convert = (wk) => gWkSD(...wk.split("-W").map(Number), weekStart);
         return convert(kA) - convert(kB);
+      })
+      .filter(([_, week]) => {
+        const hasDays = week.days.some(([_, { events }]) => events.length > 0);
+        const hasTrueEvent = week.trueEvents.some(({ filler }) => !filler);
+        return hasDays || hasTrueEvent;
       });
+    console.log(Package);
     return Package;
   },
   weekFromDate(date, weekStart = 1) {

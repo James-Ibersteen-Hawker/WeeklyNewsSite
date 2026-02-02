@@ -451,8 +451,9 @@ const vueApp = Vue.createApp({
     carouselCards.forEach((card) => {
       this.resizeObserver.observe(card);
     });
+    console.log(this.response);
     this.makeLinks(this.response.fontPreconnectLinks);
-    this.setWeek(4);
+    this.setWeek(this.weeks.length - 1);
     hideloadingscreen();
     this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
       return week.trueEvents.map((e) => ({
@@ -462,7 +463,6 @@ const vueApp = Vue.createApp({
     });
     this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
     this.UpdateCardsHeight();
-    console.log(this.response);
   },
   computed: {
     days() {

@@ -145,11 +145,11 @@
         for="events"
         fixed-height="55"
         :custom-classes="['headings', 'navBar']"
-        :headings="longTerm.map(event => event.Name)"
-        :function-bindings="[]"
+        :headings="['Toggle Long Term', ...longTerm.map(event => event.Name)]"
+        :function-bindings="{'Toggle Long Term': toggleLongTerm}"
       ></nav-bar>
       <section
-        class="longTerm text-center justify-content-center container-fluid"
+        class="longTerm text-center justify-content-center container-fluid collapse show"
         :id="idSyntax('Long Term', 1)"
       >
         <div class="center">

@@ -64,7 +64,6 @@ const sheet = {
     return await result.json();
   },
   async getWeeks() {
-    console.log("here");
     let result = null;
     try {
       result = await this.load();

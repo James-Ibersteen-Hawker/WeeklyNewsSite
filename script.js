@@ -250,9 +250,15 @@ const vueApp = Vue.createApp({
     async clearData() {
       localStorage.removeItem(this.responseKey);
       if (this.refreshAble === true) {
+        Array.from(document.querySelectorAll("section")).forEach((e) =>
+          e.classList.add("refreshing"),
+        );
         this.refreshAble = false;
         await this.loadCycleFunc();
         this.setWeek(this.index);
+        Array.from(document.querySelectorAll("section")).forEach((e) =>
+          e.classList.remove("refreshing"),
+        );
         setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
       }
     },
@@ -413,6 +419,13 @@ const vueApp = Vue.createApp({
       const offcanvasEl = document.getElementById("timeMachineOff");
       const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
       offcanvas.hide();
+    },
+    toggleLongTerm() {
+      const dropDown = document.querySelector(
+        `#${this.idSyntax("Long Term", 1)}`,
+      );
+      const bsCollapse = new bootstrap.Collapse(dropDown);
+      bsCollapse.toggle();
     },
   },
   async mounted() {

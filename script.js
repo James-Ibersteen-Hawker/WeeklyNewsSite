@@ -195,7 +195,7 @@ const navBar = {
         <div class="container-fluid">
           <a class="navbar-brand" ></a>
           <button
-            class="navbar-toggler"
+            class="navbar-toggler "
             type="button"
             data-bs-toggle="collapse"
             :data-bs-target="'#' + navName"
@@ -208,7 +208,7 @@ const navBar = {
           <div class="collapse navbar-collapse" :id="navName">
             <div class="navbar-nav">
               <a
-                class="nav-link"
+                class="nav-link hoverstyling"
                 aria-current="page"
                 v-for="(heading, i) in headings"
                 >

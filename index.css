@@ -18,7 +18,18 @@ header {
   position: fixed;
   top: 0;
   left: 0;
+.longTerm {
+  /* background-color: rgb(0, 0, 128); */
+}
+body {
   width: 100%;
+  height: 100%;
+   background: url(imgs/bgimg.png), linear-gradient(to bottom, rgb(0, 0, 105), black) !important; 
+   background-repeat: no-repeat;
+   background-attachment: fixed;
+}
+.topBtn {
+  display: none;
   z-index: 5;
 }
 footer {
@@ -48,6 +59,18 @@ footer {
   width: 100%;
   margin-right: auto;
   margin-left: auto;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+  border: solid 2px goldenrod;
+  color: black;
+  border-radius: 10px;
+  height: 60px !important;
+  aspect-ratio: 1/1;
+  background-color: white;
+  text-align: center;
+  padding-top: 15px;
+  font-weight:bold;
 }
 .longTerm .center {
   background: greenyellow;
@@ -57,9 +80,12 @@ footer {
   padding-bottom: 150px;
   margin-right: auto;
   margin-left: auto;
+.topBtn:hover {
+  color: rgb(192, 148, 35);
+  background-color: rgb(224, 224, 224);
 }
 .card {
-  background: linear-gradient(to bottom, blue, green);
+  
   display: flex !important;
   flex-direction: column;
   justify-content: start;
@@ -76,6 +102,9 @@ footer {
 .card .event {
   border: 1px solid red;
   box-shadow: 0px 0px 10px black inset;
+  width: 100%;
+  border: 1px solid ;
+  box-shadow: 0px 0px 5px black inset;
   width: 90%;
 }
 .card-carousel .card img {
@@ -109,10 +138,10 @@ footer {
   object-fit: cover;
 }
 .currentWeek {
-  color: purple;
+  color: gold;
 }
 .currentDay {
-  background: red !important;
+  background: gold !important;
 }
 .topBtn {
   display: none;
@@ -125,9 +154,26 @@ footer {
   border-radius: 10px;
   height: 50px !important;
   aspect-ratio: 1 / 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+}
+.navBar {
+  border-top : solid rgb(237, 186, 61);
+  border-bottom : solid rgb(237, 186, 61);
+  width: 100%;
+  background-color: rgb(0, 0, 0);
+  color: whitesmoke !important;
+}
+.nav-link {
+  color: whitesmoke !important;
 }
 .topBtn:hover {
   color: red;
+.tabs {
+  background: re;
+  width: 100%;
 }
 #loadingscreen {
   width: 100vw;
@@ -176,6 +222,23 @@ footer {
   line-height: 50px;
   animation: scroll-left 20s linear infinite reverse;
 }
+
+.event {
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.offcanvas {
+  background: linear-gradient(to left, darkblue, black);
+  border-left: solid goldenrod 10px ;
+  color:whitesmoke;
+}
+
+.btn-close {
+  --bs-btn-close-color: whitesmoke !important;
+  filter: invert(100%);
+}
+
 @keyframes scroll-left {
   from {
     transform: translateX(0);
@@ -187,6 +250,77 @@ footer {
 .hiding {
   animation: fadeout 5s linear forwards;
   -webkit-animation: fadeout 5s linear forwards;
+}
+
+.gold-inverted-card {
+  /* Dark obsidian base with a central golden energy core */
+  background: radial-gradient(circle at center, #ffe600 -20%, goldenrod 20%, #8b6508 80%);
+  
+  /* Metallic gold border */
+  border: 2px solid #ffcc00;
+  border-radius: 12px;
+  
+  /* Card sizing */
+  width: 320px;
+  height: 450px;
+  position: relative;
+  overflow: hidden;
+  
+  /* Initial glow state */
+  box-shadow: 
+    inset 0 0 30px rgba(255, 153, 0, 0.4), 
+    0 0 15px rgba(255, 215, 0, 0.2);
+
+  /* Link the idle animations here */
+  animation: gold-pulse 4s ease-in-out infinite;
+}
+
+/* 1. Breathing Energy Pulse */
+@keyframes gold-pulse {
+  0%, 100% {
+    /* Subtle dim state */
+    box-shadow: 
+      inset 0 0 25px rgba(255, 153, 0, 0.3), 
+      0 0 10px rgba(255, 215, 0, 0.1);
+    border-color: #8b6508;
+  }
+  50% {
+    /* Energized bright state */
+    box-shadow: 
+      inset 0 0 45px rgba(255, 200, 0, 0.5), 
+      0 0 25px rgba(255, 215, 0, 0.4);
+    border-color: #ffffff;
+  }
+}
+
+/* 2. Subtle Moving Shimmer Overlay */
+.gold-inverted-card::before {
+  content: '';
+  position: absolute;
+  top: 0; 
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right, 
+    transparent, 
+    rgba(255, 255, 255, 0.05), 
+    transparent
+  );
+  transform: skewX(-25deg);
+  animation: shimmer 8s infinite;
+}
+
+.hoverstyling:hover {
+   border: 2px solid #ffcc00;
+  border-radius: 12px;
+   animation: gold-pulse 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  20% { left: 150%; }
+  100% { left: 150%; }
 }
 @keyframes fadeout {
   0% {

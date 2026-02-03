@@ -242,3 +242,6 @@ footer {
     transform: translateX(-50%) rotate(356.4deg);
   }
 }
+.disabled {
+  color: turquoise !important;
+}

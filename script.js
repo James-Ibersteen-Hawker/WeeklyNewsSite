@@ -211,6 +211,7 @@ const navBar = {
                 class="nav-link"
                 aria-current="page"
                 v-for="(heading, i) in headings"
+                :id="heading.split(' ').join('-') + 'nav'"
                 >
                 <div @click="scrollTo(heading, i)" v-if="!bindings[heading]">{{heading}}</div>
                 <div @click="bindings[heading]" v-if="bindings[heading]">{{heading}}</div>
@@ -228,6 +229,7 @@ const vueApp = Vue.createApp({
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
+      returnTimeout: 5,
       weeks: [],
       response: {},
       currentWeek: null,
@@ -235,6 +237,7 @@ const vueApp = Vue.createApp({
       searchString: "",
       searchResults: [],
       fuse: null,
+      abortMessage: "",
       searchOptions: {
         keys: ["Date", "DateEnd", "Name", "Text", "METATEXT"],
         ignoreDiacritics: true,
@@ -248,18 +251,30 @@ const vueApp = Vue.createApp({
   },
   methods: {
     async clearData() {
-      localStorage.removeItem(this.responseKey);
-      if (this.refreshAble === true) {
-        Array.from(document.querySelectorAll("section")).forEach((e) =>
-          e.classList.add("refreshing"),
-        );
-        this.refreshAble = false;
+      if (this.refreshAble === false) return;
+      this.refreshAble = false;
+      document.querySelector("#Refreshnav").classList.add("disabled");
+      const sections = Array.from(document.querySelectorAll("section"));
+      const item = localStorage.getItem(this.responseKey);
+      try {
+        localStorage.removeItem(this.responseKey);
+        sections.forEach((e) => e.classList.add("refreshing"));
         await this.loadCycleFunc();
+      } catch (error) {
+        if (item) localStorage.setItem(this.responseKey, item);
+        else localStorage.removeItem(this.responseKey);
+        if (error.name === "AbortError") {
+          this.abortMessage =
+            "Connection timed out. You can try again in 10 seconds.";
+        } else this.abortMessage = "Alternative error";
+        alert(this.abortMessage);
+      } finally {
         this.setWeek(this.index);
-        Array.from(document.querySelectorAll("section")).forEach((e) =>
-          e.classList.remove("refreshing"),
-        );
-        setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
+        sections.forEach((e) => e.classList.remove("refreshing"));
+        setTimeout(() => {
+          this.refreshAble = true;
+          document.querySelector("#Refreshnav").classList.remove("disabled");
+        }, this.refreshTimeout);
       }
     },
     DataStorage(obj, key, setGet) {
@@ -271,14 +286,27 @@ const vueApp = Vue.createApp({
       }
     },
     async loadCycleFunc() {
-      this.response = await this.refresh();
-      this.weeks = this.response.weeks;
-      this.DataStorage(this.response, this.responseKey, "set");
+      const controller = new AbortController();
+      const signal = controller.signal;
+      const timer = this.withTimeout(this.returnTimeout * 1000, controller);
+      try {
+        this.response = await this.refresh(signal);
+        this.weeks = this.response.weeks;
+        this.DataStorage(this.response, this.responseKey, "set");
+      } catch (err) {
+        if (err.name === "AbortError") throw err;
+        throw new Error("Error in loading");
+      } finally {
+        clearTimeout(timer);
+      }
     },
-    async refresh() {
-      const response = await sheet.getWeeks();
+    async refresh(signal) {
+      const response = await sheet.getWeeks(signal);
       this.makeLinks(response.fontPreconnectLinks);
       return response;
+    },
+    withTimeout(ms, controller) {
+      return setTimeout(() => controller.abort(), ms);
     },
     makeLinks(linksParam) {
       const urls = linksParam.map((link) => {

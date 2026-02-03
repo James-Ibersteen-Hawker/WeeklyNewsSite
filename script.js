@@ -117,6 +117,7 @@ const EventBox = {
 };
 const navBar = {
   props: {
+    title: { type: String, default: "" },
     name: { type: String, default: "", required: true },
     customClasses: { type: Array, default: () => [] },
     headings: { type: Array, default: () => [], required: true },
@@ -193,7 +194,7 @@ const navBar = {
   },
   template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
-          <a class="navbar-brand" ></a>
+          <a class="navbar-brand" >{{title}}</a>
           <button
             class="navbar-toggler"
             type="button"

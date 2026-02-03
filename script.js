@@ -455,6 +455,38 @@ const vueApp = Vue.createApp({
       const bsCollapse = new bootstrap.Collapse(dropDown);
       bsCollapse.toggle();
     },
+    ISOtoText(ISO) {
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const [yyyy, mm, dd] = ISO.slice(0, 10).split("-").map(Number);
+      const suffix = (num) => {
+        if ([11, 12, 13].includes(num) || num.toString().split("").at(-1) > 3)
+          return "th";
+        else {
+          switch (num.toString().split("").at(-1) > 3) {
+            case 1:
+              return "st";
+            case 2:
+              return "nd";
+            case 3:
+              return "rd";
+          }
+        }
+      };
+      return `${months[mm - 1]} ${dd}${suffix(dd)}, ${yyyy}`;
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");

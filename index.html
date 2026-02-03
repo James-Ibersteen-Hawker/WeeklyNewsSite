@@ -92,7 +92,7 @@
               :id="i + 1"
               :class="{currentDay: dayNow === day[0]}"
             >
-              <div class="date">{{ISOtoDate(day[0])}}</div>
+              <div class="date">{{ISOtoText(day[0])}}</div>
               <div v-if="day[1].events.length === 0">No Events</div>
               <event-box
                 v-for="event in day[1].events"

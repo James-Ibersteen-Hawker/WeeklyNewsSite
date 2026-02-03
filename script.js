@@ -286,7 +286,6 @@ const vueApp = Vue.createApp({
       }
     },
     async loadCycleFunc(initial = false) {
-      console.log(initial);
       const controller = new AbortController();
       const signal = controller.signal;
       const timer = this.withTimeout(this.returnTimeout * 1000, controller);
@@ -507,13 +506,11 @@ const vueApp = Vue.createApp({
       this.weeks = this.response.weeks;
       this.setWeek(this.weeks.length - 1);
     }
-    console.log(cacheData, "cache");
     this.setupMount();
   },
   computed: {
     days() {
       try {
-        console.log(this.currentWeek, "currentWeek");
         if (!this.currentWeek?.[1]?.days) return [];
         return this.currentWeek[1].days;
       } catch (error) {
@@ -543,7 +540,6 @@ const vueApp = Vue.createApp({
   watch: {
     weeks: {
       handler(newWeeks) {
-        console.log("");
         this.flattenWeek = newWeeks.flatMap(([wNum, week]) => {
           return week.trueEvents.map((e) => ({
             ...e,

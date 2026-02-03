@@ -117,6 +117,7 @@ const EventBox = {
 };
 const navBar = {
   props: {
+    title: { type: String, default: "" },
     name: { type: String, default: "", required: true },
     customClasses: { type: Array, default: () => [] },
     headings: { type: Array, default: () => [], required: true },
@@ -191,9 +192,9 @@ const navBar = {
       });
     });
   },
-  template: `<nav class="navbar navbar-expand-lg" :class="customClasses" :style="positionStyle">
+  template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
-          <a class="navbar-brand" ></a>
+          <a class="navbar-brand" >{{title}}</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -211,6 +212,7 @@ const navBar = {
                 class="nav-link"
                 aria-current="page"
                 v-for="(heading, i) in headings"
+                :id="heading.split(' ').join('-') + 'nav'"
                 >
                 <div @click="scrollTo(heading, i)" v-if="!bindings[heading]">{{heading}}</div>
                 <div @click="bindings[heading]" v-if="bindings[heading]">{{heading}}</div>
@@ -228,6 +230,7 @@ const vueApp = Vue.createApp({
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
+      returnTimeout: 5,
       weeks: [],
       response: {},
       currentWeek: null,
@@ -235,6 +238,7 @@ const vueApp = Vue.createApp({
       searchString: "",
       searchResults: [],
       fuse: null,
+      abortMessage: "",
       searchOptions: {
         keys: ["Date", "DateEnd", "Name", "Text", "METATEXT"],
         ignoreDiacritics: true,
@@ -242,18 +246,36 @@ const vueApp = Vue.createApp({
         includeMatches: true,
         minMatchCharLength: 2,
         ignoreLocation: true,
-        threshold: 0.3,
+        threshold: 0.5,
       },
     };
   },
   methods: {
     async clearData() {
-      localStorage.removeItem(this.responseKey);
-      if (this.refreshAble === true) {
-        this.refreshAble = false;
+      if (this.refreshAble === false) return;
+      this.refreshAble = false;
+      document.querySelector("#Refreshnav").classList.add("disabled");
+      const sections = Array.from(document.querySelectorAll("section"));
+      const item = localStorage.getItem(this.responseKey);
+      try {
+        localStorage.removeItem(this.responseKey);
+        sections.forEach((e) => e.classList.add("refreshing"));
         await this.loadCycleFunc();
+      } catch (error) {
+        if (item) localStorage.setItem(this.responseKey, item);
+        else localStorage.removeItem(this.responseKey);
+        if (error.name === "AbortError") {
+          this.abortMessage =
+            "Connection timed out. You can try again in 10 seconds.";
+        } else this.abortMessage = "Alternative error";
+        alert(this.abortMessage);
+      } finally {
         this.setWeek(this.index);
-        setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
+        sections.forEach((e) => e.classList.remove("refreshing"));
+        setTimeout(() => {
+          this.refreshAble = true;
+          document.querySelector("#Refreshnav").classList.remove("disabled");
+        }, this.refreshTimeout);
       }
     },
     DataStorage(obj, key, setGet) {
@@ -265,14 +287,27 @@ const vueApp = Vue.createApp({
       }
     },
     async loadCycleFunc() {
-      this.response = await this.refresh();
-      this.weeks = this.response.weeks;
-      this.DataStorage(this.response, this.responseKey, "set");
+      const controller = new AbortController();
+      const signal = controller.signal;
+      const timer = this.withTimeout(this.returnTimeout * 1000, controller);
+      try {
+        this.response = await this.refresh(signal);
+        this.weeks = this.response.weeks;
+        this.DataStorage(this.response, this.responseKey, "set");
+      } catch (err) {
+        if (err.name === "AbortError") throw err;
+        throw new Error("Error in loading");
+      } finally {
+        clearTimeout(timer);
+      }
     },
-    async refresh() {
-      const response = await sheet.getWeeks();
+    async refresh(signal) {
+      const response = await sheet.getWeeks(signal);
       this.makeLinks(response.fontPreconnectLinks);
       return response;
+    },
+    withTimeout(ms, controller) {
+      return setTimeout(() => controller.abort(), ms);
     },
     makeLinks(linksParam) {
       const urls = linksParam.map((link) => {
@@ -414,6 +449,45 @@ const vueApp = Vue.createApp({
       const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
       offcanvas.hide();
     },
+    toggleLongTerm() {
+      const dropDown = document.querySelector(
+        `#${this.idSyntax("Long Term", 1)}`,
+      );
+      const bsCollapse = new bootstrap.Collapse(dropDown);
+      bsCollapse.toggle();
+    },
+    ISOtoText(ISO) {
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const [yyyy, mm, dd] = ISO.slice(0, 10).split("-").map(Number);
+      const suffix = (num) => {
+        if ([11, 12, 13].includes(num) || num.toString().split("").at(-1) > 3)
+          return "th";
+        else {
+          switch (num.toString().split("").at(-1) > 3) {
+            case 1:
+              return "st";
+            case 2:
+              return "nd";
+            case 3:
+              return "rd";
+          }
+        }
+      };
+      return `${months[mm - 1]} ${dd}${suffix(dd)}, ${yyyy}`;
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");
@@ -438,8 +512,9 @@ const vueApp = Vue.createApp({
     carouselCards.forEach((card) => {
       this.resizeObserver.observe(card);
     });
+    console.log(this.response);
     this.makeLinks(this.response.fontPreconnectLinks);
-    this.setWeek(4);
+    this.setWeek(this.weeks.length - 1);
     hideloadingscreen();
     this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
       return week.trueEvents.map((e) => ({
@@ -449,7 +524,6 @@ const vueApp = Vue.createApp({
     });
     this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
     this.UpdateCardsHeight();
-    console.log(this.response);
   },
   computed: {
     days() {
@@ -508,7 +582,12 @@ const vueApp = Vue.createApp({
           const result = new Set(
             this.fuse
               .search(this.searchString)
-              .map((r) => JSON.stringify(this.getWeek(r.item.week))),
+              .map((r) => JSON.stringify(this.getWeek(r.item.week)))
+              .sort((a, b) => {
+                const { startDate: aST } = JSON.parse(a);
+                const { startDate: bST } = JSON.parse(b);
+                return new Date(aST) - new Date(bST);
+              }),
           );
           this.searchResults = [...result].map((r) => JSON.parse(r));
         }

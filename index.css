@@ -10,41 +10,53 @@ body {
 main {
   padding-top: 100px;
 }
+section {
+  min-height: 50vh;
+}
+header {
+  background-origin: yellow;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+}
+footer {
+  width: 100%;
+  height: 100px;
+  background: maroon;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  z-index: 5;
+}
+.navBar {
+  background: purple;
+  width: 100%;
+}
+.tabs {
+  background: purple;
+  width: 100%;
+}
+.event {
+  padding: 10px;
+}
 .longTerm .event {
   width: 100%;
   margin-right: auto;
   margin-left: auto;
-}
-.event {
-  padding: 10px;
 }
 .longTerm .center {
   background: greenyellow;
   width: 80%;
   min-height: 50vh;
   padding: 20px;
+  padding-bottom: 150px;
   margin-right: auto;
   margin-left: auto;
-  padding-bottom: 150px;
-}
-body {
-  width: 100%;
-  height: 100%;
-}
-.topBtn {
-  display: none;
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 10;
-  border: solid 2px white;
-  color: Black;
-  border-radius: 10px;
-  height: 50px !important;
-  aspect-ratio: 1/1;
-}
-.topBtn:hover {
-  color: red;
 }
 .card {
   background: linear-gradient(to bottom, blue, green);
@@ -66,111 +78,6 @@ body {
   box-shadow: 0px 0px 10px black inset;
   width: 90%;
 }
-.currentWeek {
-  color: purple;
-}
-.currentDay {
-  background: red !important;
-}
-header {
-  background-origin: yellow;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 5;
-}
-.navBar {
-  background: purple;
-  width: 100%;
-}
-.tabs {
-  background: purple;
-  width: 100%;
-}
-#loadingscreen {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0%;
-  left: 0%;
-  background: linear-gradient(to bottom, rgb(0, 0, 110), rgb(0, 0, 29));
-  z-index: 10;
-}
-#scrollingtextbar1 {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  margin-top: 100px;
-  width: 100%;
-  height: 100px;
-  line-height: 50px;
-  color: transparent;
-  font-size: 2em;
-  white-space: nowrap;
-  overflow: hidden;
-  border: solid 2px gold;
-  background-color: rgb(0, 0, 94);
-}
-#scrollingtextbar2 {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  margin-top: 200px;
-  width: 100%;
-  height: 100px;
-  line-height: 50px;
-  color: transparent;
-  font-size: 2em;
-  white-space: nowrap;
-  overflow: hidden;
-  border: solid 2px gold;
-  background-color: rgb(0, 0, 94);
-}
-#loadingicon {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  object-position: center;
-  object-fit: contain;
-  margin-top: 200px;
-  width: 200px;
-}
-.textcolor {
-  color: whitesmoke;
-  animation: scroll-left 20s linear infinite;
-  line-height: 50px;
-}
-.textcolor1 {
-  color: whitesmoke;
-  animation: scroll-left 20s linear infinite;
-  line-height: 50px;
-  animation-direction: reverse;
-}
-@keyframes scroll-left {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-99vw);
-  }
-}
-.hiding {
-  animation: fadeout 5s linear 1;
-  -webkit-animation: fadeout 5s linear 1;
-  animation-fill-mode: forwards;
-}
-@keyframes fadeout {
-  0% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
 .card-carousel .card img {
   width: 100%;
   aspect-ratio: 5/2;
@@ -183,29 +90,160 @@ header {
   margin-left: auto;
 }
 .imgCarousel img {
+  width: 100%;
+  padding: 0 !important;
+  box-sizing: content-box;
+  aspect-ratio: 3/1;
   object-fit: cover;
   object-position: top center;
-  width: 100%;
-  aspect-ratio: 3/1;
+  cursor: pointer;
+  transition: 0.2s;
 }
-footer {
-  width: 100%;
-  height: 100px;
-  background: maroon;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 5;
+.imgCarousel img:hover {
+  box-shadow: 0px 0px 5px black;
+  transition: 0.2s;
 }
 .oneImage img {
   border: 1px solid blue;
   aspect-ratio: unset !important;
+  object-fit: cover;
 }
-section {
-  min-height: 50vh;
+.currentWeek {
+  color: purple;
+}
+.currentDay {
+  background: red !important;
+}
+.topBtn {
+  display: none;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+  border: solid 2px white;
+  color: black;
+  border-radius: 10px;
+  height: 50px !important;
+  aspect-ratio: 1 / 1;
+}
+.topBtn:hover {
+  color: red;
+}
+#loadingscreen {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: linear-gradient(to bottom, rgb(0, 0, 110), rgb(0, 0, 29));
+  z-index: 10;
+}
+#loadingicon {
+  margin: 200px auto 0;
+  display: block;
+  width: 200px;
+  object-fit: contain;
+  object-position: center;
+}
+#scrollingtextbar1,
+#scrollingtextbar2 {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+  line-height: 50px;
+  color: transparent;
+  font-size: 2em;
+  white-space: nowrap;
+  overflow: hidden;
+  border: solid 2px gold;
+  background-color: rgb(0, 0, 94);
+}
+#scrollingtextbar1 {
+  margin-top: 100px;
+}
+#scrollingtextbar2 {
+  margin-top: 200px;
+}
+.textcolor {
+  color: whitesmoke;
+  line-height: 50px;
+  animation: scroll-left 20s linear infinite;
+}
+.textcolor1 {
+  color: whitesmoke;
+  line-height: 50px;
+  animation: scroll-left 20s linear infinite reverse;
+}
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-99vw);
+  }
+}
+.hiding {
+  animation: fadeout 5s linear forwards;
+  -webkit-animation: fadeout 5s linear forwards;
+}
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.refreshing {
+  background: red;
+  position: relative;
+}
+.refreshing::before {
+  content: "";
+  position: absolute;
+  background: rgb(255, 219, 219);
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.refreshing::after {
+  content: "";
+  position: absolute;
+  background: conic-gradient(red, transparent 80%);
+  z-index: 2;
+  width: 70px;
+  height: 70px;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  mask-image: radial-gradient(
+    circle at center,
+    transparent 45%,
+    blue 45% 60%,
+    transparent 60%
+  );
+  animation-name: refresh;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@keyframes refresh {
+  0% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) rotate(356.4deg);
+  }
+}
+.disabled {
+  color: turquoise !important;
 }
 .offcanvas-header h5 {
   text-align: center;

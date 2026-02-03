@@ -59,18 +59,17 @@ const sheet = {
       return d;
     }
   },
-  async load() {
-    const result = await fetch(this.ENDPOINT);
-    return await result.json();
-  },
-  async getWeeks() {
-    console.log("here");
-    let result = null;
+  async load(signal) {
     try {
-      result = await this.load();
+      const result = await fetch(this.ENDPOINT, { signal });
+      return await result.json();
     } catch (error) {
-      return new Error("failed to fetch");
+      if (error.name === "AbortError") throw error;
+      throw new Error("Fetch failure");
     }
+  },
+  async getWeeks(signal) {
+    const result = await this.load(signal);
     const Package = {
       fontPreconnectLinks: result.fontPreconnectLinks,
       weeks: new Map(),
@@ -110,7 +109,13 @@ const sheet = {
       .sort(([kA], [kB]) => {
         const convert = (wk) => gWkSD(...wk.split("-W").map(Number), weekStart);
         return convert(kA) - convert(kB);
+      })
+      .filter(([_, week]) => {
+        const hasDays = week.days.some(([_, { events }]) => events.length > 0);
+        const hasTrueEvent = week.trueEvents.some(({ filler }) => !filler);
+        return hasDays || hasTrueEvent;
       });
+    console.log(Package);
     return Package;
   },
   weekFromDate(date, weekStart = 1) {

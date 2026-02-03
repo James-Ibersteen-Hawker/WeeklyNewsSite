@@ -82,6 +82,7 @@
     </div>
     <header>
       <nav-bar
+        title="Sections"
         name="sections"
         for="sections"
         :custom-classes="['navBar']"
@@ -103,7 +104,7 @@
               :id="i + 1"
               :class="{currentDay: dayNow === day[0]}"
             >
-              <div class="date">{{ISOtoDate(day[0])}}</div>
+              <div class="date">{{ISOtoText(day[0])}}</div>
               <div v-if="day[1].events.length === 0">No Events</div>
               <event-box
                 v-for="event in day[1].events"
@@ -152,15 +153,16 @@
       </section>
       <hr id="split" />
       <nav-bar
+        title="Long Term Events"
         name="longTerm"
         for="events"
         fixed-height="55"
         :custom-classes="['headings', 'navBar']"
-        :headings="longTerm.map(event => event.Name)"
-        :function-bindings="[]"
+        :headings="['Toggle Long Term', ...longTerm.map(event => event.Name)]"
+        :function-bindings="{'Toggle Long Term': toggleLongTerm}"
       ></nav-bar>
       <section
-        class="longTerm text-center justify-content-center container-fluid"
+        class="longTerm text-center justify-content-center container-fluid collapse show"
         :id="idSyntax('Long Term', 1)"
       >
         <div class="center">

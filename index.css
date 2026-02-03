@@ -2,30 +2,27 @@ html {
   width: 100%;
   height: 100%;
 }
-
-main {
-  margin-top: 100px;
-}
-
-.longTerm {
-  /* background-color: rgb(0, 0, 128); */
-}
-
 body {
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgb(0, 0, 105), black);
+  --accent: gold;
+  --accent-2: goldenrod;
+  --bg-main: rgb(0, 0, 110);
+  --main-color: whitesmoke;
+  background: linear-gradient(to bottom, var(--bg-main), black);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-
+main {
+  margin-top: 100px;
+}
 .topBtn {
   display: none;
   position: fixed;
   right: 20px;
   bottom: 20px;
   z-index: 10;
-  border: solid 2px goldenrod;
+  border: solid 2px var(--accent-2);
   color: black;
   border-radius: 10px;
   height: 60px !important;
@@ -34,81 +31,66 @@ body {
   text-align: center;
   padding-top: 15px;
   font-weight: bold;
+  transition: 0.2s;
+  cursor: pointer;
 }
-
 .topBtn:hover {
-  color: rgb(192, 148, 35);
-  background-color: rgb(224, 224, 224);
+  transition: 0.2s;
+  color: var(--accent-2);
+  background-color: var(--main-color);
 }
-
 .card {
-
   display: flex !important;
   flex-direction: column;
   justify-content: start;
   align-items: center;
+  cursor: w-resize;
 }
-
 .card .date {
-  border-bottom: 1px solid gold;
+  border-bottom: 1px solid var(--accent);
   width: 100%;
-  color: white;
+  color: var(--main-color);
   height: 50px;
   line-height: 50px;
   margin-bottom: 10px;
 }
-
 .card .event {
   width: 100%;
-  border: 1px solid;
   box-shadow: 0px 0px 5px black inset;
   width: 90%;
 }
-
 .currentWeek {
-  color: gold;
+  color: var(--accent);
 }
-
 .currentDay {
-  background: gold !important;
+  background: var(--accent) !important;
 }
-
 header {
-  background-origin: yellow;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 5;
 }
-
 .navBar {
-  border-top: solid rgb(237, 186, 61);
-  border-bottom: solid rgb(237, 186, 61);
+  border-top: solid var(--accent-2);
+  border-bottom: solid var(--accent-2);
   width: 100%;
   background-color: rgb(0, 0, 0);
-  color: whitesmoke !important;
+  color: var(--main-color) !important;
 }
-
 .nav-link {
-  color: whitesmoke !important;
+  color: var(--main-color) !important;
 }
-
-.tabs {
-  background: re;
-  width: 100%;
-}
-
 #loadingscreen {
   width: 100vw;
   height: 100vh;
   position: fixed;
   top: 0%;
   left: 0%;
-  background: linear-gradient(to bottom, rgb(0, 0, 110), rgb(0, 0, 29));
+  background: linear-gradient(to bottom, var(--bg-main), rgb(0, 0, 29));
   z-index: 10;
 }
-
 #scrollingtextbar1 {
   display: flex;
   justify-content: start;
@@ -121,10 +103,9 @@ header {
   font-size: 2em;
   white-space: nowrap;
   overflow: hidden;
-  border: solid 2px gold;
-  background-color: rgb(0, 0, 94);
+  border: solid 2px var(--accent);
+  background-color: var(--bg-main);
 }
-
 #scrollingtextbar2 {
   display: flex;
   justify-content: start;
@@ -137,10 +118,9 @@ header {
   font-size: 2em;
   white-space: nowrap;
   overflow: hidden;
-  border: solid 2px gold;
-  background-color: rgb(0, 0, 94);
+  border: solid 2px var(--accent);
+  background-color: var(--bg-main);
 }
-
 #loadingicon {
   margin-left: auto;
   margin-right: auto;
@@ -150,36 +130,42 @@ header {
   margin-top: 200px;
   width: 200px;
 }
-
 .textcolor {
-  color: whitesmoke;
+  color: var(--main-color);
   animation: scroll-left 20s linear infinite;
   line-height: 50px;
 }
-
 .textcolor1 {
-  color: whitesmoke;
+  color: var(--main-color);
   animation: scroll-left 20s linear infinite;
   line-height: 50px;
   animation-direction: reverse;
 }
-
 .event {
   margin-left: 40px;
   margin-right: 40px;
+  padding: 5px;
+  border-radius: 2px;
+  cursor: default !important;
 }
-
+.event img {
+  border-radius: 5px;
+  box-shadow: 0px 0px 3px black;
+  transition: 0.2s;
+  cursor: pointer !important;
+}
+.event img:hover {
+  box-shadow: 0px 0px 7px black;
+  transition: 0.2s;
+}
 .offcanvas {
   background: linear-gradient(to left, darkblue, black);
-  border-left: solid goldenrod 10px;
-  color: whitesmoke;
+  border-left: solid var(--accent-2) 10px;
+  color: var(--main-color);
 }
-
-.btn-close {
-  --bs-btn-close-color: whitesmoke !important;
+.offcanvas .btn-close {
   filter: invert(100%);
 }
-
 @keyframes scroll-left {
   from {
     transform: translateX(0);
@@ -189,79 +175,65 @@ header {
     transform: translateX(-99vw);
   }
 }
-
 .hiding {
   animation: fadeout 5s linear 1;
   -webkit-animation: fadeout 5s linear 1;
   animation-fill-mode: forwards;
 }
-
 .gold-inverted-card {
-  /* Dark obsidian base with a central golden energy core */
-  background: radial-gradient(circle at center, #ffe600 -20%, goldenrod 20%, #8b6508 80%);
-
-  /* Metallic gold border */
+  background: radial-gradient(
+    circle at center,
+    #ffe600 -20%,
+    var(--accent-2) 20%,
+    #8b6508 80%
+  );
   border: 2px solid #ffcc00;
   border-radius: 12px;
-
-  /* Card sizing */
   width: 320px;
   height: 450px;
   position: relative;
   overflow: hidden;
-
-  /* Initial glow state */
   box-shadow:
     inset 0 0 30px rgba(255, 153, 0, 0.4),
     0 0 15px rgba(255, 215, 0, 0.2);
-
-  /* Link the idle animations here */
   animation: gold-pulse 4s ease-in-out infinite;
 }
-
-/* 1. Breathing Energy Pulse */
 @keyframes gold-pulse {
-
   0%,
   100% {
-    /* Subtle dim state */
     box-shadow:
       inset 0 0 25px rgba(255, 153, 0, 0.3),
       0 0 10px rgba(255, 215, 0, 0.1);
     border-color: #8b6508;
   }
-
   50% {
-    /* Energized bright state */
     box-shadow:
       inset 0 0 45px rgba(255, 200, 0, 0.5),
       0 0 25px rgba(255, 215, 0, 0.4);
     border-color: #ffffff;
   }
 }
-
-/* 2. Subtle Moving Shimmer Overlay */
 .gold-inverted-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(to right,
-      transparent,
-      rgba(255, 255, 255, 0.05),
-      transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
   transform: skewX(-25deg);
   animation: shimmer 8s infinite;
 }
-
 .hoverstyling:hover {
   border: 2px solid #ffcc00;
   border-radius: 12px;
   animation: gold-pulse 4s ease-in-out infinite;
 }
-
 @keyframes shimmer {
   0% {
     left: -100%;
@@ -275,7 +247,6 @@ header {
     left: 150%;
   }
 }
-
 @keyframes fadeout {
   0% {
     opacity: 1;
@@ -289,43 +260,41 @@ header {
     opacity: 0;
   }
 }
-
 .refreshing {
-  background: red;
   position: relative;
+  cursor: progress;
 }
-
 .refreshing::before {
   content: "";
   position: absolute;
-  background: rgb(255, 219, 219);
+  background: var(--bg-main);
   z-index: 2;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
 }
-
 .refreshing::after {
   content: "";
   position: absolute;
-  background: conic-gradient(red, transparent 80%);
+  background: conic-gradient(var(--accent), transparent 80%);
   z-index: 2;
   width: 70px;
   height: 70px;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  mask-image: radial-gradient(circle at center,
-      transparent 45%,
-      blue 45% 60%,
-      transparent 60%);
+  mask-image: radial-gradient(
+    circle at center,
+    transparent 45%,
+    black 45% 60%,
+    transparent 60%
+  );
   animation-name: refresh;
   animation-duration: 1s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
-
 @keyframes refresh {
   0% {
     transform: translateX(-50%) rotate(0deg);
@@ -335,19 +304,76 @@ header {
     transform: translateX(-50%) rotate(356.4deg);
   }
 }
-
 .disabled {
   color: turquoise !important;
 }
-
 .offcanvas-header h5 {
   text-align: center;
   font-family: "Gasoek One", sans-serif;
   margin: 0 auto 0 auto;
   font-size: 30px;
-  -webkit-text-stroke: 1px gold !important;
+  -webkit-text-stroke: 1px var(--accent) !important;
 }
-
 label {
   margin-left: 10px;
+}
+.longTerm .center {
+  width: 80%;
+  background: var(--bg-main);
+  padding: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0px 0px 5px white;
+}
+footer {
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to bottom, darkblue, black);
+  border-top: 10px solid var(--accent);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.weekOf {
+  color: var(--main-color);
+}
+.navbar-brand {
+  color: white;
+  font-family: "Gasoek One", sans-serif;
+}
+a {
+  cursor: pointer;
+}
+.card-carousel .card img {
+  width: 100%;
+  aspect-ratio: 5/2;
+  object-fit: cover;
+  object-position: top center;
+}
+.imgCarousel {
+  width: 70%;
+  margin-right: auto;
+  margin-left: auto;
+}
+.imgCarousel .subImg {
+  transform: scale(0.8);
+}
+.imgCarousel img {
+  width: 100%;
+  padding: 0 !important;
+  box-sizing: content-box;
+  aspect-ratio: 3/1;
+  object-fit: cover;
+  object-position: top center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.imgCarousel img:hover {
+  box-shadow: 0px 0px 5px black;
+  transition: 0.2s;
+}
+.oneImage img {
+  aspect-ratio: unset !important;
+  object-fit: cover;
 }

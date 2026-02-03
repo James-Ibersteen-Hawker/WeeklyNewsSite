@@ -16,7 +16,7 @@
 </head>
 
 <body id="vueApp">
-  <div id="loadingscreen" class="">
+  <div id="loadingscreen">
     <div id="scrollingtextbar1">
       <h3 class="textcolor" id="repeat">
         MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
@@ -74,7 +74,7 @@
   </header>
   <main>
     <section class="shortTerm text-center justify-content-center container-fluid" :id="idSyntax('Short Term', 0)">
-      {{weekOf}}
+      <div class="weekOf">{{weekOf}}</div>
       <div class="card-container d-none d-sm-block">
         <div class="card-carousel">
           <div class="card gold-inverted-card" v-for="(day, i) in days" :id="i + 1"
@@ -152,7 +152,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <img id="modalTarget" />
+          <img id="modalTarget" class="img-fluid" />
         </div>
       </div>
     </div>

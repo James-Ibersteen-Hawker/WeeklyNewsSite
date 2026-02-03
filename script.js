@@ -530,7 +530,7 @@ const vueApp = Vue.createApp({
     },
     weekOf() {
       const date = this.timeMachine[this.index];
-      if (date) return `Week Of ${this.ISOtoDate(date)}`;
+      if (date) return `Week of ${this.ISOtoDate(date)}`;
     },
   },
   components: {

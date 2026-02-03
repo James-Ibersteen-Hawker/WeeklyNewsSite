@@ -14,13 +14,11 @@
   position: relative;
   padding: 20px;
   margin-top: 2em;
-  background: rgba(0, 0, 0, 0.1);
   min-height: 40vh;
 }
 .card-carousel {
   --card-width: 80%;
-  --card-max-width: 500px;
-  --card-height: 700px;
+  --card-max-width: 700px;
   --carousel-min-width: 600px;
   z-index: 1;
   position: relative;
@@ -37,18 +35,19 @@
 }
 .card-carousel .card {
   width: var(--card-width);
+  max-width: var(--card-max-width);
   text-align: center;
   min-width: 250px;
   min-height: 40vh;
   position: absolute;
   margin: 0 auto;
-  color: rgba(0, 0, 0, 0.5);
+  color: black;
   transition: inherit;
   -webkit-box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.3);
   box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.3);
   border-radius: 1em;
-  filter: brightness(0.9);
+  filter: brightness(0.8);
 }
 .card.highlight {
   filter: brightness(1);

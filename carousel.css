@@ -14,7 +14,8 @@
   position: relative;
   padding: 20px;
   margin-top: 2em;
-  /* background: rgba(0, 0, 0, 0.1); */
+  background: rgba(0, 0, 0, 0.1);
+  min-height: 40vh;
 }
 .card-carousel {
   --card-width: 80%;
@@ -28,7 +29,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* height: var(--card-height); */
+  min-height: 40vh;
   transition: filter 0.3s ease;
 }
 .card-carousel.smooth-return {
@@ -36,10 +37,9 @@
 }
 .card-carousel .card {
   width: var(--card-width);
-  max-width: var(--card-max-width);
   text-align: center;
   min-width: 250px;
-  /* height: var(--card-height); */
+  min-height: 40vh;
   position: absolute;
   margin: 0 auto;
   color: rgba(0, 0, 0, 0.5);

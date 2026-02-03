@@ -97,19 +97,15 @@ const EventBox = {
               <h1 v-if="event.Name" class="eName" :style="headingStyle">
                 {{event.Name}}
               </h1>
-              <carousel
-                v-if="images.length && ['Top Right', 'Top Left', 'Above'].includes(event.ImagePosition)"
-                :images="images"
-                :style="floatStyle(event.ImagePosition)">
-              </carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Top Right'" :images="images"></carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Top Left'" :images="images"></carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Above'" :images="images"></carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
                 {{event.Text}}
               </p>
-              <carousel
-                v-if="images.length && ['Bottom Right', 'Bottom Left', 'Below'].includes(event.ImagePosition)"
-                :images="images"
-                :style="floatStyle(event.ImagePosition)">
-              </carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Below'" :images="images"></carousel>
+               <carousel v-if="images.length && event.ImagePosition === 'Bottom Right'" :images="images"></carousel>
+              <carousel v-if="images.length && event.ImagePosition === 'Bottom Left'" :images="images"></carousel>
               <p class="metaText d-none" v-if="event.METATEXT">
                 {{event.METATEXT}}
               </p>
@@ -117,6 +113,7 @@ const EventBox = {
 };
 const navBar = {
   props: {
+    title: { type: String, default: "" },
     name: { type: String, default: "", required: true },
     customClasses: { type: Array, default: () => [] },
     headings: { type: Array, default: () => [], required: true },
@@ -193,7 +190,7 @@ const navBar = {
   },
   template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
-          <a class="navbar-brand" ></a>
+          <a class="navbar-brand" href="#">Navbar</a>
           <button
             class="navbar-toggler "
             type="button"
@@ -211,10 +208,9 @@ const navBar = {
                 class="nav-link hoverstyling"
                 aria-current="page"
                 v-for="(heading, i) in headings"
-                >
-                <div @click="scrollTo(heading, i)" v-if="!bindings[heading]">{{heading}}</div>
-                <div @click="bindings[heading]" v-if="bindings[heading]">{{heading}}</div>
-                </a>
+                @click="scrollTo(heading, i)"
+                >{{heading}}</a
+              >
             </div>
           </div>
         </div>
@@ -228,31 +224,24 @@ const vueApp = Vue.createApp({
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
+      returnTimeout: 5,
       weeks: [],
       response: {},
       currentWeek: null,
       resized: false,
-      searchString: "",
-      searchResults: [],
-      fuse: null,
-      searchOptions: {
-        keys: ["Date", "DateEnd", "Name", "Text", "METATEXT"],
-        ignoreDiacritics: true,
-        includeScore: true,
-        includeMatches: true,
-        minMatchCharLength: 2,
-        ignoreLocation: true,
-        threshold: 0.5,
-      },
     };
   },
   methods: {
     async clearData() {
-      localStorage.removeItem(this.responseKey);
-      if (this.refreshAble === true) {
-        this.refreshAble = false;
+      if (this.refreshAble === false) return;
+      this.refreshAble = false;
+      document.querySelector("#Refreshnav").classList.add("disabled");
+      const sections = Array.from(document.querySelectorAll("section"));
+      const item = localStorage.getItem(this.responseKey);
+      try {
+        localStorage.removeItem(this.responseKey);
+        sections.forEach((e) => e.classList.add("refreshing"));
         await this.loadCycleFunc();
-        this.setWeek(this.index);
         setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
       }
     },
@@ -264,15 +253,36 @@ const vueApp = Vue.createApp({
         else return false;
       }
     },
-    async loadCycleFunc() {
-      this.response = await this.refresh();
-      this.weeks = this.response.weeks;
-      this.DataStorage(this.response, this.responseKey, "set");
+    async loadCycleFunc(initial = false) {
+      const controller = new AbortController();
+      const signal = controller.signal;
+      const timer = this.withTimeout(this.returnTimeout * 1000, controller);
+      try {
+        this.response = await this.refresh(signal);
+        this.weeks = this.response.weeks;
+        this.DataStorage(this.response, this.responseKey, "set");
+      } catch (err) {
+        if (err.name === "AbortError") throw err;
+        throw new Error("Error in loading");
+      } finally {
+        clearTimeout(timer);
+        if (initial) this.setWeek(this.weeks.length - 1);
+        else this.setWeek(this.index);
+      }
     },
-    async refresh() {
-      const response = await sheet.getWeeks();
-      this.makeLinks(response.fontPreconnectLinks);
-      return response;
+    async refresh(signal) {
+      try {
+        const response = await sheet.getWeeks(signal);
+        this.makeLinks(response.fontPreconnectLinks);
+        return response;
+      } catch (err) {
+        throw err;
+      }
+    },
+    withTimeout(ms, controller) {
+      return setTimeout(() => {
+        controller.abort();
+      }, ms);
     },
     makeLinks(linksParam) {
       const urls = linksParam.map((link) => {
@@ -297,33 +307,6 @@ const vueApp = Vue.createApp({
           link.href = href;
           document.head.appendChild(link);
         }
-      });
-    },
-    trackReload(callback) {
-      const keys = new Set();
-      const keyMap = new Map();
-      keyMap.set("control+r", callback);
-      // keyMap.set("control+shift+r", callback);
-      keyMap.set("meta+r", callback);
-      // keyMap.set("meta+shift+r", callback);
-      window.addEventListener("keydown", (e) => {
-        e.preventDefault();
-        if (e.repeat) return;
-        keys.add(e.key.toLowerCase());
-        const combo = [...keys].join("+");
-        const func = keyMap.get(combo);
-        if (func && this.refreshAble) {
-          console.log("reloaded", `timeout = ${this.refreshAble}`);
-          func();
-          this.refreshAble = false;
-          setTimeout(
-            (() => (this.refreshAble = true)).bind(this),
-            this.refreshTimeout,
-          );
-        }
-      });
-      window.addEventListener("keyup", (e) => {
-        keys.delete(e.key.toLowerCase());
       });
     },
     findDayNow() {
@@ -404,16 +387,6 @@ const vueApp = Vue.createApp({
       carouselCards.forEach((card) => (card.style.height = `${heights[0]}px`));
       this.resized = false;
     },
-    openTimeMachine() {
-      const offcanvasEl = document.getElementById("timeMachineOff");
-      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
-      offcanvas.show();
-    },
-    closeTimeMachine() {
-      const offcanvasEl = document.getElementById("timeMachineOff");
-      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
-      offcanvas.hide();
-    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");
@@ -439,17 +412,9 @@ const vueApp = Vue.createApp({
       this.resizeObserver.observe(card);
     });
     this.makeLinks(this.response.fontPreconnectLinks);
+    console.log(this.response);
     this.setWeek(4);
     hideloadingscreen();
-    this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
-      return week.trueEvents.map((e) => ({
-        ...e,
-        week: wNum,
-      }));
-    });
-    this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
-    this.UpdateCardsHeight();
-    console.log(this.response);
   },
   computed: {
     days() {

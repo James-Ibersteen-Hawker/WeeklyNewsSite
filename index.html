@@ -16,7 +16,7 @@
 </head>
 
 <body id="vueApp">
-  <div id="loadingscreen" class="">
+  <div id="loadingscreen" class="d-none">
     <div id="scrollingtextbar1">
       <h3 class="textcolor" id="repeat">
         MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
@@ -79,14 +79,15 @@
         <div class="card-carousel">
           <div class="card gold-inverted-card" v-for="(day, i) in days" :id="i + 1"
             :class="{currentDay: dayNow === day[0]}">
-            <div class="date">{{ISOtoText(day[0])}}</div>
+            <div class="date">{{ISOtoDate(day[0])}}</div>
             <div v-if="day[1].events.length === 0">No Events</div>
             <event-box v-for="event in day[1].events" :event="event"></event-box>
           </div>
         </div>
-        <a href="#" class="visuallyhidden card-controller">
-          Carousel controller
-        </a>
+      </div>
+      <a href="#" class="visuallyhidden card-controller">
+        Carousel controller
+      </a>
       </div>
       <div class="dropdown-container d-block d-sm-none">
         <div class="accordion" id="accordionExample">
@@ -109,7 +110,8 @@
     </section>
     <hr id="split" />
     <nav-bar title="Long Term Events" name="longTerm" for="events" fixed-height="55"
-      :custom-classes="['headings', 'navBar']" :headings="longTerm.map(event => event.Name)"></nav-bar>
+      :custom-classes="['headings', 'navBar']" :headings="['Toggle Long Term', ...longTerm.map(event => event.Name)]"
+      :function-bindings="{'Toggle Long Term': toggleLongTerm}"></nav-bar>
     <section class="longTerm text-center justify-content-center container-fluid collapse show"
       :id="idSyntax('Long Term', 1)">
       <div class="center">

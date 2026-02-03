@@ -97,15 +97,19 @@ const EventBox = {
               <h1 v-if="event.Name" class="eName" :style="headingStyle">
                 {{event.Name}}
               </h1>
-              <carousel v-if="images.length && event.ImagePosition === 'Top Right'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Top Left'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Above'" :images="images"></carousel>
+              <carousel 
+                v-if="images.length && ['Top Right', 'Top Left', 'Above'].includes(event.ImagePosition)"
+                :images="images" 
+                :style="floatStyle(event.ImagePosition)">
+              </carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
                 {{event.Text}}
               </p>
-              <carousel v-if="images.length && event.ImagePosition === 'Below'" :images="images"></carousel>
-               <carousel v-if="images.length && event.ImagePosition === 'Bottom Right'" :images="images"></carousel>
-              <carousel v-if="images.length && event.ImagePosition === 'Bottom Left'" :images="images"></carousel>
+              <carousel 
+                v-if="images.length && ['Bottom Right', 'Bottom Left', 'Below'].includes(event.ImagePosition)"
+                :images="images" 
+                :style="floatStyle(event.ImagePosition)">
+              </carousel>
               <p class="metaText d-none" v-if="event.METATEXT">
                 {{event.METATEXT}}
               </p>
@@ -190,9 +194,9 @@ const navBar = {
   },
   template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Navbar</a>
+          <a class="navbar-brand" >{{title}}</a>
           <button
-            class="navbar-toggler "
+            class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
             :data-bs-target="'#' + navName"
@@ -205,12 +209,14 @@ const navBar = {
           <div class="collapse navbar-collapse" :id="navName">
             <div class="navbar-nav">
               <a
-                class="nav-link hoverstyling"
+                class="nav-link"
                 aria-current="page"
                 v-for="(heading, i) in headings"
-                @click="scrollTo(heading, i)"
-                >{{heading}}</a
-              >
+                :id="heading.split(' ').join('-') + 'nav'"
+                >
+                <div @click="scrollTo(heading, i)" v-if="!bindings[heading]">{{heading}}</div>
+                <div @click="bindings[heading]" v-if="bindings[heading]">{{heading}}</div>
+                </a>
             </div>
           </div>
         </div>
@@ -229,6 +235,19 @@ const vueApp = Vue.createApp({
       response: {},
       currentWeek: null,
       resized: false,
+      searchString: "",
+      searchResults: [],
+      fuse: null,
+      abortMessage: "",
+      searchOptions: {
+        keys: ["Date", "DateEnd", "Name", "Text", "METATEXT"],
+        ignoreDiacritics: true,
+        includeScore: true,
+        includeMatches: true,
+        minMatchCharLength: 2,
+        ignoreLocation: true,
+        threshold: 0.5,
+      },
     };
   },
   methods: {
@@ -242,7 +261,20 @@ const vueApp = Vue.createApp({
         localStorage.removeItem(this.responseKey);
         sections.forEach((e) => e.classList.add("refreshing"));
         await this.loadCycleFunc();
-        setTimeout(() => (this.refreshAble = true), this.refreshTimeout);
+      } catch (error) {
+        if (item) localStorage.setItem(this.responseKey, item);
+        else localStorage.removeItem(this.responseKey);
+        if (error.name === "AbortError") {
+          this.abortMessage =
+            "Connection timed out. You can try again in 10 seconds.";
+        } else this.abortMessage = "Alternative error";
+        alert(this.abortMessage);
+      } finally {
+        sections.forEach((e) => e.classList.remove("refreshing"));
+        setTimeout(() => {
+          this.refreshAble = true;
+          document.querySelector("#Refreshnav").classList.remove("disabled");
+        }, this.refreshTimeout);
       }
     },
     DataStorage(obj, key, setGet) {
@@ -387,34 +419,94 @@ const vueApp = Vue.createApp({
       carouselCards.forEach((card) => (card.style.height = `${heights[0]}px`));
       this.resized = false;
     },
+    openTimeMachine() {
+      const offcanvasEl = document.getElementById("timeMachineOff");
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+      offcanvas.show();
+    },
+    closeTimeMachine() {
+      const offcanvasEl = document.getElementById("timeMachineOff");
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+      offcanvas.hide();
+    },
+    toggleLongTerm() {
+      const dropDown = document.querySelector(
+        `#${this.idSyntax("Long Term", 1)}`,
+      );
+      const bsCollapse = new bootstrap.Collapse(dropDown);
+      bsCollapse.toggle();
+    },
+    ISOtoText(ISO) {
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const [yyyy, mm, dd] = ISO.slice(0, 10).split("-").map(Number);
+      const suffix = (num) => {
+        if ([11, 12, 13].includes(num) || num.toString().split("").at(-1) > 3)
+          return "th";
+        else {
+          switch (num.toString().split("").at(-1) > 3) {
+            case 1:
+              return "st";
+            case 2:
+              return "nd";
+            case 3:
+              return "rd";
+          }
+        }
+      };
+      return `${months[mm - 1]} ${dd}${suffix(dd)}, ${yyyy}`;
+    },
+    setupMount() {
+      this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
+      this.$nextTick(() => {
+        if (window.makeCarousel) window.makeCarousel();
+        else throw new Error("makeCarousel is not defined");
+        this.UpdateCardsHeight();
+      });
+      this.resizeObserver = new ResizeObserver(async () => {
+        if (!this.resized) await this.UpdateCardsHeight();
+      });
+      window.addEventListener("resize", this.UpdateCardsHeight);
+      const carouselCards = Array.from(
+        document.querySelectorAll(".card-carousel .card"),
+      );
+      carouselCards.forEach((card) => this.resizeObserver.observe(card));
+      console.log(this.response);
+      this.makeLinks(this.response.fontPreconnectLinks);
+      hideloadingscreen();
+      this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
+        return week.trueEvents.map((e) => ({
+          ...e,
+          week: wNum,
+        }));
+      });
+      this.UpdateCardsHeight();
+    },
   },
   async mounted() {
     const cacheData = this.DataStorage(null, this.responseKey, "get");
+    this.fuse = new Fuse([], this.searchOptions);
     if (!cacheData) {
-      this.response = await this.refresh();
+      await this.loadCycleFunc(true);
       this.DataStorage(this.response, this.responseKey, "set");
-    } else this.response = cacheData;
-    this.weeks = this.response.weeks;
-    this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.$nextTick(() => {
-      if (window.makeCarousel) window.makeCarousel();
-      else throw new Error("makeCarousel is not defined");
-      this.UpdateCardsHeight();
-    });
-    this.resizeObserver = new ResizeObserver(async () => {
-      if (!this.resized) await this.UpdateCardsHeight();
-    });
-    window.addEventListener("resize", this.UpdateCardsHeight);
-    const carouselCards = Array.from(
-      document.querySelectorAll(".card-carousel .card"),
-    );
-    carouselCards.forEach((card) => {
-      this.resizeObserver.observe(card);
-    });
-    this.makeLinks(this.response.fontPreconnectLinks);
-    console.log(this.response);
-    this.setWeek(4);
-    hideloadingscreen();
+    } else {
+      this.response = cacheData;
+      this.weeks = this.response.weeks;
+      this.setWeek(this.weeks.length - 1);
+    }
+    this.setupMount();
   },
   computed: {
     days() {

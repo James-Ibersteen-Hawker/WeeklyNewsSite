@@ -286,6 +286,7 @@ const vueApp = Vue.createApp({
       }
     },
     async loadCycleFunc(initial = false) {
+      console.log(initial);
       const controller = new AbortController();
       const signal = controller.signal;
       const timer = this.withTimeout(this.returnTimeout * 1000, controller);
@@ -298,8 +299,8 @@ const vueApp = Vue.createApp({
         throw new Error("Error in loading");
       } finally {
         clearTimeout(timer);
-        if (!initial) this.setWeek(this.index);
-        else if (initial) this.setWeek(this.weeks.length - 1);
+        if (initial) this.setWeek(this.weeks.length - 1);
+        else this.setWeek(this.index);
       }
     },
     async refresh(signal) {
@@ -496,7 +497,6 @@ const vueApp = Vue.createApp({
     },
   },
   async mounted() {
-    localStorage.clear();
     const cacheData = this.DataStorage(null, this.responseKey, "get");
     this.fuse = new Fuse([], this.searchOptions);
     if (!cacheData) {
@@ -505,12 +505,15 @@ const vueApp = Vue.createApp({
     } else {
       this.response = cacheData;
       this.weeks = this.response.weeks;
+      this.setWeek(this.weeks.length - 1);
     }
+    console.log(cacheData, "cache");
     this.setupMount();
   },
   computed: {
     days() {
       try {
+        console.log(this.currentWeek, "currentWeek");
         if (!this.currentWeek?.[1]?.days) return [];
         return this.currentWeek[1].days;
       } catch (error) {
@@ -540,6 +543,7 @@ const vueApp = Vue.createApp({
   watch: {
     weeks: {
       handler(newWeeks) {
+        console.log("");
         this.flattenWeek = newWeeks.flatMap(([wNum, week]) => {
           return week.trueEvents.map((e) => ({
             ...e,

@@ -270,7 +270,6 @@ const vueApp = Vue.createApp({
         } else this.abortMessage = "Alternative error";
         alert(this.abortMessage);
       } finally {
-        this.setWeek(this.index);
         sections.forEach((e) => e.classList.remove("refreshing"));
         setTimeout(() => {
           this.refreshAble = true;
@@ -286,7 +285,7 @@ const vueApp = Vue.createApp({
         else return false;
       }
     },
-    async loadCycleFunc() {
+    async loadCycleFunc(initial = false) {
       const controller = new AbortController();
       const signal = controller.signal;
       const timer = this.withTimeout(this.returnTimeout * 1000, controller);
@@ -299,15 +298,23 @@ const vueApp = Vue.createApp({
         throw new Error("Error in loading");
       } finally {
         clearTimeout(timer);
+        if (!initial) this.setWeek(this.index);
+        else if (initial) this.setWeek(this.weeks.length - 1);
       }
     },
     async refresh(signal) {
-      const response = await sheet.getWeeks(signal);
-      this.makeLinks(response.fontPreconnectLinks);
-      return response;
+      try {
+        const response = await sheet.getWeeks(signal);
+        this.makeLinks(response.fontPreconnectLinks);
+        return response;
+      } catch (err) {
+        throw err;
+      }
     },
     withTimeout(ms, controller) {
-      return setTimeout(() => controller.abort(), ms);
+      return setTimeout(() => {
+        controller.abort();
+      }, ms);
     },
     makeLinks(linksParam) {
       const urls = linksParam.map((link) => {
@@ -332,33 +339,6 @@ const vueApp = Vue.createApp({
           link.href = href;
           document.head.appendChild(link);
         }
-      });
-    },
-    trackReload(callback) {
-      const keys = new Set();
-      const keyMap = new Map();
-      keyMap.set("control+r", callback);
-      // keyMap.set("control+shift+r", callback);
-      keyMap.set("meta+r", callback);
-      // keyMap.set("meta+shift+r", callback);
-      window.addEventListener("keydown", (e) => {
-        e.preventDefault();
-        if (e.repeat) return;
-        keys.add(e.key.toLowerCase());
-        const combo = [...keys].join("+");
-        const func = keyMap.get(combo);
-        if (func && this.refreshAble) {
-          console.log("reloaded", `timeout = ${this.refreshAble}`);
-          func();
-          this.refreshAble = false;
-          setTimeout(
-            (() => (this.refreshAble = true)).bind(this),
-            this.refreshTimeout,
-          );
-        }
-      });
-      window.addEventListener("keyup", (e) => {
-        keys.delete(e.key.toLowerCase());
       });
     },
     findDayNow() {
@@ -488,42 +468,45 @@ const vueApp = Vue.createApp({
       };
       return `${months[mm - 1]} ${dd}${suffix(dd)}, ${yyyy}`;
     },
+    setupMount() {
+      this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
+      this.$nextTick(() => {
+        if (window.makeCarousel) window.makeCarousel();
+        else throw new Error("makeCarousel is not defined");
+        this.UpdateCardsHeight();
+      });
+      this.resizeObserver = new ResizeObserver(async () => {
+        if (!this.resized) await this.UpdateCardsHeight();
+      });
+      window.addEventListener("resize", this.UpdateCardsHeight);
+      const carouselCards = Array.from(
+        document.querySelectorAll(".card-carousel .card"),
+      );
+      carouselCards.forEach((card) => this.resizeObserver.observe(card));
+      console.log(this.response);
+      this.makeLinks(this.response.fontPreconnectLinks);
+      hideloadingscreen();
+      this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
+        return week.trueEvents.map((e) => ({
+          ...e,
+          week: wNum,
+        }));
+      });
+      this.UpdateCardsHeight();
+    },
   },
   async mounted() {
+    localStorage.clear();
     const cacheData = this.DataStorage(null, this.responseKey, "get");
+    this.fuse = new Fuse([], this.searchOptions);
     if (!cacheData) {
-      this.response = await this.refresh();
+      await this.loadCycleFunc(true);
       this.DataStorage(this.response, this.responseKey, "set");
-    } else this.response = cacheData;
-    this.weeks = this.response.weeks;
-    this.loadCycle = setInterval(this.loadCycleFunc, this.timeLoad);
-    this.$nextTick(() => {
-      if (window.makeCarousel) window.makeCarousel();
-      else throw new Error("makeCarousel is not defined");
-      this.UpdateCardsHeight();
-    });
-    this.resizeObserver = new ResizeObserver(async () => {
-      if (!this.resized) await this.UpdateCardsHeight();
-    });
-    window.addEventListener("resize", this.UpdateCardsHeight);
-    const carouselCards = Array.from(
-      document.querySelectorAll(".card-carousel .card"),
-    );
-    carouselCards.forEach((card) => {
-      this.resizeObserver.observe(card);
-    });
-    console.log(this.response);
-    this.makeLinks(this.response.fontPreconnectLinks);
-    this.setWeek(this.weeks.length - 1);
-    hideloadingscreen();
-    this.flattenWeek = this.weeks.flatMap(([wNum, week]) => {
-      return week.trueEvents.map((e) => ({
-        ...e,
-        week: wNum,
-      }));
-    });
-    this.fuse = new Fuse(this.flattenWeek, this.searchOptions);
-    this.UpdateCardsHeight();
+    } else {
+      this.response = cacheData;
+      this.weeks = this.response.weeks;
+    }
+    this.setupMount();
   },
   computed: {
     days() {

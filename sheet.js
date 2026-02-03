@@ -115,7 +115,6 @@ const sheet = {
         const hasTrueEvent = week.trueEvents.some(({ filler }) => !filler);
         return hasDays || hasTrueEvent;
       });
-    console.log(Package);
     return Package;
   },
   weekFromDate(date, weekStart = 1) {

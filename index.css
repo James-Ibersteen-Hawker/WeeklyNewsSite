@@ -97,6 +97,9 @@ header {
   background: linear-gradient(to bottom, var(--bg-main), rgb(0, 0, 29));
   z-index: 10;
 }
+.longTerm {
+  min-height: 40vh;
+}
 #scrollingtextbar1, #scrollingtextbar2 {
   position: absolute;
   left: 0;
@@ -131,15 +134,12 @@ header {
   transform: translate(-50%, -50%);
   z-index: 3;
 }
-.textcolor {
+.textcolor, .textcolor1 {
   color: var(--main-color);
   animation: scroll-left 20s linear infinite;
   line-height: 50px;
 }
 .textcolor1 {
-  color: var(--main-color);
-  animation: scroll-left 20s linear infinite;
-  line-height: 50px;
   animation-direction: reverse;
 }
 .event {
@@ -316,6 +316,7 @@ label {
 }
 .longTerm .center {
   width: 80%;
+  height: 40vh;
   background: var(--bg-main);
   padding: 10px;
   margin-left: auto;
@@ -403,4 +404,23 @@ a {
   font-family: "Tangerine", cursive;
   font-size: 40px;
   padding: 0 !important;
+}
+footer .row {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  font-size: 20px;
+  align-items: center;
+}
+.footer-item {
+  height: 40px !important;
+  margin: 0px 10px;
+  padding: 0 !important;
+  line-height: 40px;
+}
+.footer-item img {
+  height: 100% !important;
+}
+.center .noEvents {
+  color: var(--main-color);
 }

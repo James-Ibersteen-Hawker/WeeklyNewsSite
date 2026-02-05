@@ -223,6 +223,37 @@ const navBar = {
         </div>
       </nav>`,
 };
+const scrollingText = {
+  props: {
+    id: { type: String, default: "" },
+    textClass: { type: String, default: "textcolor" },
+  },
+  template: `
+  <div :id="id">
+        <h3 :class="textClass" id="repeat">
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
+          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
+        </h3>
+      </div>`,
+};
 const vueApp = Vue.createApp({
   data() {
     return {
@@ -249,6 +280,17 @@ const vueApp = Vue.createApp({
         ignoreLocation: true,
         threshold: 0.3,
       },
+      footerLinks: [
+        {
+          link: "https://www.instagram.com/marlborohsguide",
+          img: "imgs/instagram.png",
+        },
+        {
+          link: "https://www.facebook.com/MarlboroHSMustangs",
+          img: "imgs/Facebook_logo_square.png",
+        },
+        { link: "https://x.com/MarlboroHSinNJ", img: "imgs/xLogo.png" },
+      ],
     };
   },
   methods: {
@@ -294,7 +336,7 @@ const vueApp = Vue.createApp({
         this.response = await this.refresh(signal);
         this.weeks = this.response.weeks;
         this.DataStorage(this.response, this.responseKey, "set");
-        console.log("refresh", this.response)
+        console.log("refresh", this.response);
       } catch (err) {
         if (err.name === "AbortError") throw err;
         throw new Error("Error in loading");
@@ -538,6 +580,7 @@ const vueApp = Vue.createApp({
   components: {
     EventBox,
     navBar,
+    scrollingText,
   },
   watch: {
     weeks: {

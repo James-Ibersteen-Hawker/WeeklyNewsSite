@@ -34,60 +34,20 @@
   </head>
 
   <body id="vueApp">
-    <div id="loadingscreen">
-      <div id="scrollingtextbar1">
-        <h3 class="textcolor" id="repeat">
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-        </h3>
-      </div>
+    <div id="loadingscreen" class="d-none">
+      <scrolling-text
+        id="scrollingtextbar1"
+        text-class="textcolor"
+      ></scrolling-text>
       <img
         src="imgs/MarlboroHighSchool.png"
         alt="Loading Icon"
         id="loadingicon"
       />
-      <div id="scrollingtextbar2">
-        <h3 class="textcolor1" id="repeat">
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-          MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS
-          NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS MHS NEWS
-        </h3>
-      </div>
+      <scrolling-text
+        id="scrollingtextbar2"
+        text-class="textcolor1"
+      ></scrolling-text>
     </div>
     <header>
       <nav-bar
@@ -114,7 +74,9 @@
               :class="{currentDay: dayNow === day[0]}"
             >
               <div class="date">{{ISOtoDate(day[0])}}</div>
-              <div v-if="day[1].events.length === 0" class="noEvents">No Events</div>
+              <div v-if="day[1].events.length === 0" class="noEvents">
+                No Events
+              </div>
               <event-box
                 v-for="event in day[1].events"
                 :event="event"
@@ -141,6 +103,9 @@
         :id="idSyntax('Long Term', 1)"
       >
         <div class="center">
+          <div v-if="longTerm.length === 0" class="noEvents">
+                No Long Term Events
+          </div>
           <event-box
             v-for="(event, i) in longTerm"
             :event="event"
@@ -150,7 +115,21 @@
         </div>
       </section>
     </main>
-    <footer>#footer information, and general purpose links???</footer>
+    <footer class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex justify-content-center align-items-center">
+          <a
+            href="https://marlboro.frhsd.com/about-us/about-us1"
+            target="_blank"
+            class="footer-item"
+            >About Us</a
+          >
+         <a v-for="link in footerLinks" target="_blank" class="footer-item" :href="link.link">
+          <img class="img-fluid" style="filter: drop-shadow(0px 0px 1px white)" :src="link.img">
+        </a>
+        </div>
+      </div>
+    </footer>
     <div id="topBtn" class="topBtn" @click="scrollTop()">To Top</div>
     <div
       class="offcanvas offcanvas-start"
@@ -175,7 +154,14 @@
           id="search"
           name="search"
         />
-        <a data-bs-toggle="collapse" href="#response" role="button" aria-expanded="true" aria-controls="response">Click to toggle results</a>
+        <a
+          data-bs-toggle="collapse"
+          href="#response"
+          role="button"
+          aria-expanded="true"
+          aria-controls="response"
+          >Click to toggle results</a
+        >
         <div id="response" class="collapse show">
           <ul>
             <li v-for="result in searchResults">

@@ -17,7 +17,7 @@
   min-height: 40vh;
 }
 .card-carousel {
-  --card-width: 80%;
+  --card-width: 90%;
   --card-max-width: 700px;
   --carousel-min-width: 600px;
   z-index: 1;

@@ -104,6 +104,7 @@ const EventBox = {
               </carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
                 {{event.Text}}
+                <a v-for="link in event.LINKS" :href="link.url" target="_blank">{{link.text}}</a>
               </p>
               <carousel 
                 v-if="images.length && ['Bottom Right', 'Bottom Left', 'Below'].includes(event.ImagePosition)"
@@ -246,7 +247,7 @@ const vueApp = Vue.createApp({
         includeMatches: true,
         minMatchCharLength: 2,
         ignoreLocation: true,
-        threshold: 0.5,
+        threshold: 0.3,
       },
     };
   },
@@ -293,6 +294,7 @@ const vueApp = Vue.createApp({
         this.response = await this.refresh(signal);
         this.weeks = this.response.weeks;
         this.DataStorage(this.response, this.responseKey, "set");
+        console.log("refresh", this.response)
       } catch (err) {
         if (err.name === "AbortError") throw err;
         throw new Error("Error in loading");

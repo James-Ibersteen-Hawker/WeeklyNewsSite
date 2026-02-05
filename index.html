@@ -175,8 +175,8 @@
           id="search"
           name="search"
         />
-        <label for="search">Search</label>
-        <div id="response">
+        <a data-bs-toggle="collapse" href="#response" role="button" aria-expanded="true" aria-controls="response">Click to toggle results</a>
+        <div id="response" class="collapse show">
           <ul>
             <li v-for="result in searchResults">
               <p @click="setWeek(result.index)">

@@ -103,8 +103,8 @@ const EventBox = {
                 :style="floatStyle(event.ImagePosition)">
               </carousel>
               <p v-if="event.Text" class="eBody" :style="bodyStyle">
-                {{event.Text}}
-                <a v-for="link in event.LINKS" :href="link.url" target="_blank">{{link.text}}</a>
+                {{event.Text}}<br>
+                <a v-for="link in event.LINKS" :href="link.url" target="_blank">{{link.text}}<br></a>
               </p>
               <carousel 
                 v-if="images.length && ['Bottom Right', 'Bottom Left', 'Below'].includes(event.ImagePosition)"

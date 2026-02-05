@@ -34,7 +34,7 @@
   </head>
 
   <body id="vueApp">
-    <div id="loadingscreen" class="d-none">
+    <div id="loadingscreen">
       <scrolling-text
         id="scrollingtextbar1"
         text-class="textcolor"
@@ -104,7 +104,7 @@
       >
         <div class="center">
           <div v-if="longTerm.length === 0" class="noEvents">
-                No Long Term Events
+            No Long Term Events
           </div>
           <event-box
             v-for="(event, i) in longTerm"
@@ -124,9 +124,18 @@
             class="footer-item"
             >About Us</a
           >
-         <a v-for="link in footerLinks" target="_blank" class="footer-item" :href="link.link">
-          <img class="img-fluid" style="filter: drop-shadow(0px 0px 1px white)" :src="link.img">
-        </a>
+          <a
+            v-for="link in footerLinks"
+            target="_blank"
+            class="footer-item"
+            :href="link.link"
+          >
+            <img
+              class="img-fluid"
+              style="filter: drop-shadow(0px 0px 1px white)"
+              :src="link.img"
+            />
+          </a>
         </div>
       </div>
     </footer>
@@ -147,30 +156,39 @@
         ></button>
       </div>
       <div class="offcanvas-body">
-        <input
-          type="search"
-          placeholder="Search Events"
-          v-model="searchString"
-          id="search"
-          name="search"
-        />
-        <a
-          data-bs-toggle="collapse"
-          href="#response"
-          role="button"
-          aria-expanded="true"
-          aria-controls="response"
-          >Click to toggle results</a
-        >
+        <div class="row">
+          <div class="col-6">
+            <input
+              type="search"
+              placeholder="Search Events"
+              v-model="searchString"
+              id="search"
+              maxlength="25"
+              name="search"
+            />
+          </div>
+          <div class="col-6">
+            <a
+              data-bs-toggle="collapse"
+              href="#response"
+              role="button"
+              aria-expanded="true"
+              aria-controls="response"
+              class="toggleResults"
+              >Click to toggle results</a
+            >
+          </div>
+        </div>
         <div id="response" class="collapse show">
           <ul>
-            <li v-for="result in searchResults">
+            <li v-for="result in searchResults" class="responseLi">
               <p @click="setWeek(result.index)">
                 {{ISOtoDate(result.startDate)}}
               </p>
             </li>
           </ul>
         </div>
+        <div class="spacer"></div>
         <div
           class="date"
           v-for="(date, i) in timeMachine"

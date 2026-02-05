@@ -209,7 +209,7 @@ const navBar = {
           <div class="collapse navbar-collapse" :id="navName">
             <div class="navbar-nav">
               <a
-                class="nav-link"
+                class="nav-link hoverstyling"
                 aria-current="page"
                 v-for="(heading, i) in headings"
                 :id="heading.split(' ').join('-') + 'nav'"

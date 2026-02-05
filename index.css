@@ -2,6 +2,7 @@ html {
   width: 100%;
   height: 100%;
 }
+
 body {
   width: 100%;
   height: 100%;
@@ -9,13 +10,17 @@ body {
   --accent-2: goldenrod;
   --bg-main: rgb(0, 0, 110);
   --main-color: whitesmoke;
-  background: linear-gradient(to bottom, var(--bg-main), black);
-  background-repeat: no-repeat;
+  background:
+    url("imgs/download-removebg-preview\ \(1\).png") center,
+    linear-gradient(to bottom, var(--bg-main), black);
   background-attachment: fixed;
+  animation: bg-move 2000s linear infinite;
 }
+
 main {
   margin-top: 100px;
 }
+
 .topBtn {
   display: none;
   position: fixed;
@@ -34,11 +39,13 @@ main {
   transition: 0.2s;
   cursor: pointer;
 }
+
 .topBtn:hover {
   transition: 0.2s;
   color: var(--accent-2);
   background-color: var(--main-color);
 }
+
 .card {
   display: flex !important;
   flex-direction: column;
@@ -46,6 +53,7 @@ main {
   align-items: center;
   cursor: w-resize;
 }
+
 .card .date {
   border-bottom: 1px solid var(--accent);
   width: 100%;
@@ -54,17 +62,21 @@ main {
   line-height: 50px;
   margin-bottom: 10px;
 }
+
 .card .event {
   width: 100%;
   box-shadow: 0px 0px 5px black inset;
   width: 90%;
 }
+
 .currentWeek {
   color: var(--accent);
 }
+
 .currentDay {
   background: var(--accent) !important;
 }
+
 header {
   position: fixed;
   top: 0;
@@ -72,6 +84,7 @@ header {
   width: 100%;
   z-index: 5;
 }
+
 .navBar {
   border-top: solid var(--accent-2);
   border-bottom: solid var(--accent-2);
@@ -79,9 +92,11 @@ header {
   background-color: rgb(0, 0, 0);
   color: var(--main-color) !important;
 }
+
 .nav-link {
   color: var(--main-color) !important;
 }
+
 #loadingscreen {
   width: 100vw;
   height: 100vh;
@@ -91,6 +106,7 @@ header {
   background: linear-gradient(to bottom, var(--bg-main), rgb(0, 0, 29));
   z-index: 10;
 }
+
 #scrollingtextbar1 {
   display: flex;
   justify-content: start;
@@ -103,9 +119,11 @@ header {
   font-size: 2em;
   white-space: nowrap;
   overflow: hidden;
-  border: solid 2px var(--accent);
+  border-top: solid 2px var(--accent);
+  border-bottom: solid 2px var(--accent);
   background-color: var(--bg-main);
 }
+
 #scrollingtextbar2 {
   display: flex;
   justify-content: start;
@@ -118,9 +136,11 @@ header {
   font-size: 2em;
   white-space: nowrap;
   overflow: hidden;
-  border: solid 2px var(--accent);
+  border-top: solid 2px var(--accent);
+  border-bottom: solid 2px var(--accent);
   background-color: var(--bg-main);
 }
+
 #loadingicon {
   margin-left: auto;
   margin-right: auto;
@@ -130,17 +150,20 @@ header {
   margin-top: 200px;
   width: 200px;
 }
+
 .textcolor {
   color: var(--main-color);
   animation: scroll-left 20s linear infinite;
   line-height: 50px;
 }
+
 .textcolor1 {
   color: var(--main-color);
   animation: scroll-left 20s linear infinite;
   line-height: 50px;
   animation-direction: reverse;
 }
+
 .event {
   margin-left: 40px;
   margin-right: 40px;
@@ -148,24 +171,29 @@ header {
   border-radius: 2px;
   cursor: default !important;
 }
+
 .event img {
   border-radius: 5px;
   box-shadow: 0px 0px 3px black;
   transition: 0.2s;
   cursor: pointer !important;
 }
+
 .event img:hover {
   box-shadow: 0px 0px 7px black;
   transition: 0.2s;
 }
+
 .offcanvas {
   background: linear-gradient(to left, darkblue, black);
   border-left: solid var(--accent-2) 10px;
   color: var(--main-color);
 }
+
 .offcanvas .btn-close {
   filter: invert(100%);
 }
+
 @keyframes scroll-left {
   from {
     transform: translateX(0);
@@ -175,18 +203,18 @@ header {
     transform: translateX(-99vw);
   }
 }
+
 .hiding {
   animation: fadeout 5s linear 1;
   -webkit-animation: fadeout 5s linear 1;
   animation-fill-mode: forwards;
 }
+
 .gold-inverted-card {
-  background: radial-gradient(
-    circle at center,
-    #ffe600 -20%,
-    var(--accent-2) 20%,
-    #8b6508 80%
-  );
+  background: radial-gradient(circle at center,
+      #ffe600 -20%,
+      var(--accent-2) 20%,
+      #8b6508 80%);
   border: 2px solid #ffcc00;
   border-radius: 12px;
   width: 320px;
@@ -198,7 +226,9 @@ header {
     0 0 15px rgba(255, 215, 0, 0.2);
   animation: gold-pulse 4s ease-in-out infinite;
 }
+
 @keyframes gold-pulse {
+
   0%,
   100% {
     box-shadow:
@@ -206,6 +236,7 @@ header {
       0 0 10px rgba(255, 215, 0, 0.1);
     border-color: #8b6508;
   }
+
   50% {
     box-shadow:
       inset 0 0 45px rgba(255, 200, 0, 0.5),
@@ -213,6 +244,7 @@ header {
     border-color: #ffffff;
   }
 }
+
 .gold-inverted-card::before {
   content: "";
   position: absolute;
@@ -220,20 +252,20 @@ header {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(255, 255, 255, 0.05),
-    transparent
-  );
+  background: linear-gradient(to right,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent);
   transform: skewX(-25deg);
   animation: shimmer 8s infinite;
 }
+
 .hoverstyling:hover {
   border: 2px solid #ffcc00;
   border-radius: 12px;
   animation: gold-pulse 4s ease-in-out infinite;
 }
+
 @keyframes shimmer {
   0% {
     left: -100%;
@@ -247,6 +279,7 @@ header {
     left: 150%;
   }
 }
+
 @keyframes fadeout {
   0% {
     opacity: 1;
@@ -260,10 +293,12 @@ header {
     opacity: 0;
   }
 }
+
 .refreshing {
   position: relative;
   cursor: progress;
 }
+
 .refreshing::before {
   content: "";
   position: absolute;
@@ -274,6 +309,7 @@ header {
   top: 0;
   left: 0;
 }
+
 .refreshing::after {
   content: "";
   position: absolute;
@@ -284,17 +320,16 @@ header {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  mask-image: radial-gradient(
-    circle at center,
-    transparent 45%,
-    black 45% 60%,
-    transparent 60%
-  );
+  mask-image: radial-gradient(circle at center,
+      transparent 45%,
+      black 45% 60%,
+      transparent 60%);
   animation-name: refresh;
   animation-duration: 1s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
+
 @keyframes refresh {
   0% {
     transform: translateX(-50%) rotate(0deg);
@@ -304,9 +339,11 @@ header {
     transform: translateX(-50%) rotate(356.4deg);
   }
 }
+
 .disabled {
   color: turquoise !important;
 }
+
 .offcanvas-header h5 {
   text-align: center;
   font-family: "Gasoek One", sans-serif;
@@ -314,9 +351,11 @@ header {
   font-size: 30px;
   -webkit-text-stroke: 1px var(--accent) !important;
 }
+
 label {
   margin-left: 10px;
 }
+
 .longTerm .center {
   width: 80%;
   background: var(--bg-main);
@@ -325,40 +364,50 @@ label {
   margin-right: auto;
   box-shadow: 0px 0px 5px white;
 }
+
 footer {
   width: 100%;
   height: 100px;
-  background: linear-gradient(to bottom, darkblue, black);
+  background: linear-gradient(to bottom, darkblue, black, transparent);
   border-top: 10px solid var(--accent);
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .weekOf {
   color: var(--main-color);
+  text-shadow: 0px 0px 10px var(--bg-main), 0px 0px 5px var(--bg-main), 0px 0px 2px var(--bg-main);
+  filter: drop-shadow(0px 0px 5px var(--bg-main));
 }
+
 .navbar-brand {
   color: white;
   font-family: "Gasoek One", sans-serif;
 }
+
 a {
   cursor: pointer;
 }
+
 .card-carousel .card img {
   width: 100%;
   aspect-ratio: 5/2;
   object-fit: cover;
   object-position: top center;
 }
+
 .imgCarousel {
   width: 70%;
   margin-right: auto;
   margin-left: auto;
 }
+
 .imgCarousel .subImg {
   transform: scale(0.8);
 }
+
 .imgCarousel img {
   width: 100%;
   padding: 0 !important;
@@ -369,11 +418,23 @@ a {
   cursor: pointer;
   transition: 0.2s;
 }
+
 .imgCarousel img:hover {
   box-shadow: 0px 0px 5px black;
   transition: 0.2s;
 }
+
 .oneImage img {
   aspect-ratio: unset !important;
   object-fit: cover;
+}
+
+@keyframes bg-move {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 1000px 1000px, 0 0;
+  }
 }

@@ -111,12 +111,12 @@ footer .row {
 }
 .nav-link {
   color: var(--main-color) !important;
-   font-family: "Crete Round", serif !important;
+  font-family: "Crete Round", serif !important;
   font-weight: 400;
 }
 .navbar-brand {
   color: white;
-   font-family: "DM Serif Text", serif;
+  font-family: "DM Serif Text", serif;
   font-weight: 900;
   transition: 0.1s;
   cursor: default;
@@ -239,7 +239,7 @@ footer .row {
 }
 .offcanvas-header h5 {
   text-align: center;
-   font-family: "Crete Round", serif;
+  font-family: "Crete Round", serif;
   font-weight: 900;
   margin: 0 auto 0 auto;
   font-size: 30px;
@@ -550,4 +550,27 @@ input {
       0 0,
       1000px 1000px;
   }
+}
+.modal {
+  --bs-modal-border-color: var(--accent);
+  --bs-modal-border-width: 5px;
+}
+.modal-dialog .modal-content {
+  background: linear-gradient(var(--bg-main), black);
+}
+.modal .btn-close {
+  filter: invert(100%);
+}
+.modal-header {
+  --bs-modal-header-border-color: var(--accent-2);
+}
+.modal h2 {
+  color: var(--main-color);
+  font-family: 'DM Serif Text', serif;
+  font-weight: 800;
+  font-size: 20px;
+}
+.modal-content img {
+  border-radius: 2px;
+  border: 1px solid var(--accent-2);
 }

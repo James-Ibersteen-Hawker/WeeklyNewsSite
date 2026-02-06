@@ -143,7 +143,10 @@ const navBar = {
       });
     },
     idSyntax(id, i = 0) {
-      return `q-${id.split(" ").join("-")}${i}`;
+      return `q-${id
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .split(" ")
+        .join("-")}${i}`;
     },
     toFix() {
       if (this.for !== "events") return;
@@ -164,6 +167,19 @@ const navBar = {
     bindingHas(h) {
       return this.bindings.find((e) => e[0] === h);
     },
+    addListeners() {
+      const navBarCollapse = this.$el.querySelector(
+        ".collapse.navbar-collapse",
+      );
+      const links = Array.from(this.$el.querySelectorAll(".nav-link"));
+      links.forEach((link) => {
+        link.addEventListener("click", () => {
+          const bsCollapse =
+            bootstrap.Collapse.getOrCreateInstance(navBarCollapse);
+          bsCollapse.hide();
+        });
+      });
+    }
   },
   computed: {
     navName() {
@@ -179,19 +195,7 @@ const navBar = {
   },
   mounted() {
     window.addEventListener("scroll", this.toFix);
-    this.$nextTick(() => {
-      const navBarCollapse = this.$el.querySelector(
-        ".collapse.navbar-collapse",
-      );
-      const links = Array.from(this.$el.querySelectorAll(".nav-link"));
-      links.forEach((link) => {
-        link.addEventListener("click", () => {
-          const bsCollapse =
-            bootstrap.Collapse.getOrCreateInstance(navBarCollapse);
-          bsCollapse.hide();
-        });
-      });
-    });
+    this.$nextTick(() => this.addListeners());
   },
   template: `<nav class="navbar navbar-expand-md" :class="customClasses" :style="positionStyle">
         <div class="container-fluid">
@@ -222,6 +226,11 @@ const navBar = {
           </div>
         </div>
       </nav>`,
+    watch: {
+      headings() {
+    this.$nextTick(() => this.addListeners());
+      }
+    }
 };
 const scrollingText = {
   props: {
@@ -336,7 +345,6 @@ const vueApp = Vue.createApp({
         this.response = await this.refresh(signal);
         this.weeks = this.response.weeks;
         this.DataStorage(this.response, this.responseKey, "set");
-        console.log("refresh", this.response);
       } catch (err) {
         if (err.name === "AbortError") throw err;
         throw new Error("Error in loading");
@@ -415,7 +423,6 @@ const vueApp = Vue.createApp({
       else return tis.DefaultBG;
     },
     setWeek(i) {
-      console.log("set")
       this.index = i;
       this.findDayNow();
       this.closeTimeMachine();
@@ -430,7 +437,10 @@ const vueApp = Vue.createApp({
       };
     },
     idSyntax(id, i = 0) {
-      return `q-${id.split(" ").join("-")}${i}`;
+      return `q-${id
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .split(" ")
+        .join("-")}${i}`;
     },
     scrollTop() {
       window.scrollTo({
@@ -440,7 +450,6 @@ const vueApp = Vue.createApp({
       });
     },
     async UpdateCardsHeight() {
-      console.log("updatecardsheight")
       if (this.resized) return;
       this.resized = true;
       const carouselCards = Array.from(
@@ -499,7 +508,10 @@ const vueApp = Vue.createApp({
       ];
       const [yyyy, mm, dd] = ISO.slice(0, 10).split("-").map(Number);
       const suffix = (num) => {
-        if ([10,11, 12, 13].includes(num) || num.toString().split("").at(-1) > 3)
+        if (
+          [10, 11, 12, 13].includes(num) ||
+          num.toString().split("").at(-1) > 3
+        )
           return "th";
         else {
           switch (num.toString().split("").at(-1) > 3) {

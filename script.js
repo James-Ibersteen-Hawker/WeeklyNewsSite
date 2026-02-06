@@ -415,6 +415,7 @@ const vueApp = Vue.createApp({
       else return tis.DefaultBG;
     },
     setWeek(i) {
+      console.log("set")
       this.index = i;
       this.findDayNow();
       this.closeTimeMachine();
@@ -439,6 +440,7 @@ const vueApp = Vue.createApp({
       });
     },
     async UpdateCardsHeight() {
+      console.log("updatecardsheight")
       if (this.resized) return;
       this.resized = true;
       const carouselCards = Array.from(

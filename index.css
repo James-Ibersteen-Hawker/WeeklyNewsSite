@@ -398,7 +398,8 @@ input {
   animation-timing-function: linear;
 }
 .disabled {
-  color: turquoise !important;
+  /* color: turquoise !important; */
+  opacity: 0.6;
 }
 .imgCarousel {
   width: 70%;

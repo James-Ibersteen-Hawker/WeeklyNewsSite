@@ -25,7 +25,10 @@
       href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap"
       rel="stylesheet"
     />
-
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crete+Round:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="shortcut icon"
       href="/imgs/MHSLOGOOOOOO.png"
@@ -64,7 +67,8 @@
         class="shortTerm text-center justify-content-center container-fluid"
         :id="idSyntax('Short Term', 0)"
       >
-        <div class="weekOf">{{weekOf}}</div>
+        <div class="weekOf">Short Term - {{weekOf}}</div>
+        <div class="directions">- drag the cards to scroll -</div>
         <div class="card-container">
           <div class="card-carousel">
             <div
@@ -73,9 +77,9 @@
               :id="i + 1"
               :class="{currentDay: dayNow === day[0]}"
             >
-              <div class="date">{{ISOtoDate(day[0])}}</div>
+              <div class="card-date">{{ISOtoText(day[0])}}</div>
               <div v-if="day[1].events.length === 0" class="noEvents">
-                No Events
+                No Events Today
               </div>
               <event-box
                 v-for="event in day[1].events"
@@ -95,14 +99,16 @@
         for="events"
         fixed-height="55"
         :custom-classes="['headings', 'navBar']"
-        :headings="['Toggle Long Term', ...longTerm.map(event => event.Name)]"
-        :function-bindings="{'Toggle Long Term': toggleLongTerm}"
+        :headings="[...longTerm.map(event => event.Name)]"
       ></nav-bar>
       <section
-        class="longTerm text-center justify-content-center container-fluid collapse show"
+        class="longTerm text-center justify-content-center container-fluid"
         :id="idSyntax('Long Term', 1)"
       >
-        <div class="center">
+        <div v-if="longTerm.length === 0" class="outCenter noEvents">
+          No Long Term Events
+        </div>
+        <div class="center" v-if="longTerm.length > 0">
           <div v-if="longTerm.length === 0" class="noEvents">
             No Long Term Events
           </div>

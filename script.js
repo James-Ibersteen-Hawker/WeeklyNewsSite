@@ -262,7 +262,7 @@ const vueApp = Vue.createApp({
       responseKey: "response",
       refreshTimeout: 10000,
       refreshAble: true,
-      returnTimeout: 5,
+      returnTimeout: 10,
       weeks: [],
       response: {},
       currentWeek: null,
@@ -497,7 +497,7 @@ const vueApp = Vue.createApp({
       ];
       const [yyyy, mm, dd] = ISO.slice(0, 10).split("-").map(Number);
       const suffix = (num) => {
-        if ([11, 12, 13].includes(num) || num.toString().split("").at(-1) > 3)
+        if ([10,11, 12, 13].includes(num) || num.toString().split("").at(-1) > 3)
           return "th";
         else {
           switch (num.toString().split("").at(-1) > 3) {

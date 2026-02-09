@@ -119,6 +119,7 @@ class CardCarousel extends DraggingEvent {
     for (let i = 0; i < this.cards.length; i++) {
       const x = i - this.centerIndex;
       const scale = this.calcScale(x);
+      const scaleY = this.calcYScale(x);
       const scale2 = this.calcScale2(x);
       const zIndex = -Math.abs(i - this.centerIndex);
 
@@ -128,6 +129,7 @@ class CardCarousel extends DraggingEvent {
 
       this.updateCards(this.cards[i], {
         x: x,
+        scaleY: scaleY,
         scale: scale,
         leftPos: leftPos,
         zIndex: zIndex,
@@ -167,11 +169,13 @@ class CardCarousel extends DraggingEvent {
     for (let x in temp) {
       const scale = this.calcScale(x),
         scale2 = this.calcScale2(x),
+        scaleY = this.calcYScale(x),
         leftPos = this.calcPos(x, scale2),
         zIndex = -Math.abs(x);
 
       this.updateCards(this.xScale[x], {
         x: x,
+        scaleY: scaleY,
         scale: scale,
         leftPos: leftPos,
         zIndex: zIndex,
@@ -197,13 +201,19 @@ class CardCarousel extends DraggingEvent {
     }
   }
 
+  calcYScale(x) {
+    const rate = 0.05;
+    const scaleY = 1 - Math.abs(x) * rate;
+    return Math.max(scaleY, 0);
+  }
+
   updateCards(card, data) {
     if (data.x || data.x == 0) {
       card.setAttribute("data-x", data.x);
     }
 
     if (data.scale || data.scale == 0) {
-      card.style.transform = `scale(${data.scale})`;
+      card.style.transform = `scaleX(${data.scale}) scaleY(${data.scaleY})`;
 
       if (data.scale == 0) {
         card.style.opacity = data.scale;
@@ -309,11 +319,13 @@ class CardCarousel extends DraggingEvent {
           xDist,
         ),
         scale = this.calcScale(x + xDist),
+        scaleY = this.calcYScale(x + xDist),
         scale2 = this.calcScale2(x + xDist),
         leftPos = this.calcPos(x + xDist, scale2);
 
       this.updateCards(this.cards[i], {
         scale: scale,
+        scaleY: scaleY,
         leftPos: leftPos,
       });
     }

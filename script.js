@@ -15,6 +15,8 @@ const Carousel = {
     setModal(img) {
       const modal = document.querySelector("#modalTarget");
       modal.src = img;
+      const modalH = document.querySelector("#imageLinkTarget");
+      modalH.href = img;
     },
   },
   template: `

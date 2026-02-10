@@ -592,6 +592,10 @@ const vueApp = Vue.createApp({
       const date = this.timeMachine[this.index];
       if (date) return `Week of ${this.ISOtoDate(date)}`;
     },
+    todayDateISO() {
+      const date = new Date;
+      return this.ISOtoDate(date.toISOString())
+    }
   },
   components: {
     EventBox,
